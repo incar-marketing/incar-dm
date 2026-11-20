@@ -22,7 +22,7 @@ export const PPT_TOKENS = {
   agentPhone: "{연락처}"
 };
 
-const FONTS = ["buri", "dotum", "script"];
+const FONTS = ["buri", "dotum", "script", "suit"];
 
 export function formatPhone(value) {
   const digits = String(value || "").replace(/\D/g, "").slice(0, 11);
@@ -46,7 +46,7 @@ function validate(t, themeIds) {
   need(Array.isArray(t.fields) && t.fields.every(key => FIELDS[key]), `fields 는 ${Object.keys(FIELDS).join(", ")} 중에서 골라야 해요`);
   need(Array.isArray(t.texts) && t.texts.every(item =>
     typeof item.text === "string" && Number.isFinite(item.x) && Number.isFinite(item.y) && FONTS.includes(item.font) && item.size > 0),
-  "texts 의 각 줄에는 text, x, y, font(buri/dotum/script), size 가 필요해요");
+  "texts 의 각 줄에는 text, x, y, font(buri/dotum/script/suit), size 가 필요해요");
   need(["published", "draft"].includes(t.status), "status 는 published 또는 draft 여야 해요");
   need(t.pptText === undefined || (t.pptText && typeof t.pptText === "object" && Object.values(t.pptText).every(v => typeof v === "string")),
     "pptText 는 { \"PPT 안의 글자\": \"{customerName}\" } 모양이어야 해요");

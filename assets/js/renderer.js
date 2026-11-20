@@ -18,7 +18,8 @@ const KOSDAQ = { src: "assets/images/logo/kosdaq.png", w: 82, h: 29 };
 const FONT_FAMILY = {
   buri: '"buri", "Noto Serif KR", serif',
   dotum: '"dotum", "Malgun Gothic", sans-serif',
-  script: '"Pinyon Script", "Times New Roman", serif'
+  script: '"Pinyon Script", "Times New Roman", serif',
+  suit: '"SUIT", sans-serif'   // 고딕 (굵기 400/700/800)
 };
 const PLACEHOLDER = "rgba(255, 214, 0, 0.65)";
 const TOKEN = /\{(\w+)\}/g;

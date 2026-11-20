@@ -1,0 +1,86 @@
+{
+  "title": "첫 자동차보험료, 운전 경력으로 낮추기",
+  "month": "2026-11",
+  "themes": [
+    "insurance"
+  ],
+  "keywords": [
+    "자동차보험",
+    "자동차",
+    "자동차보험료",
+    "보험료",
+    "운전경력",
+    "운전 경력",
+    "경력 인정",
+    "가입경력 인정대상자",
+    "청년",
+    "사회초년생",
+    "첫 차",
+    "군 운전병",
+    "렌터카",
+    "장기렌터카",
+    "부모님",
+    "할인",
+    "절약",
+    "차액 환급"
+  ],
+  "status": "published",
+  "size": {
+    "width": 800,
+    "height": 1437
+  },
+  "thumbnail": "thumb.jpg",
+  "fileName": "자동차보험DM",
+  "backgrounds": [
+    {
+      "id": "default",
+      "label": "기본",
+      "file": "bg.jpg",
+      "ppt": "dm.pptx"
+    }
+  ],
+  "pptText": {
+    "{설계사}": "{agentName}",
+    "{010.1234.5678}": "{agentPhone}"
+  },
+  "fields": [
+    "customerName",
+    "agentName",
+    "agentPhone"
+  ],
+  "texts": [
+    {
+      "text": "{customerName} 고객님께",
+      "x": 400,
+      "y": 53.3,
+      "maxWidth": 300,
+      "font": "suit",
+      "weight": 700,
+      "size": 32.8,
+      "color": "#000000",
+      "align": "center"
+    },
+    {
+      "text": "{agentName}",
+      "x": 739.3,
+      "y": 1246,
+      "maxWidth": 380,
+      "font": "suit",
+      "weight": 800,
+      "size": 48.6,
+      "color": "#595959",
+      "align": "right"
+    },
+    {
+      "text": "{agentPhone}",
+      "x": 738,
+      "y": 1347,
+      "maxWidth": 380,
+      "font": "suit",
+      "weight": 400,
+      "size": 31.8,
+      "color": "#595959",
+      "align": "right"
+    }
+  ]
+}

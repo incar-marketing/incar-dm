@@ -1,16 +1,42 @@
 {
   "themes": [
-    { "id": "finance", "name": "금융" },
-    { "id": "health", "name": "건강" },
-    { "id": "season", "name": "계절" },
-    { "id": "insurance", "name": "보험" }
+    {
+      "id": "finance",
+      "name": "금융"
+    },
+    {
+      "id": "health",
+      "name": "건강"
+    },
+    {
+      "id": "season",
+      "name": "계절"
+    },
+    {
+      "id": "insurance",
+      "name": "보험"
+    }
   ],
   "templates": [
-    { "folder": "2026-11-autumn" }
+    {
+      "folder": "2026-11-car-insurance"
+    },
+    {
+      "folder": "2026-11-autumn"
+    }
   ],
   "upcoming": [
-    { "title": "12월 DM", "note": "곧 나와요" },
-    { "title": "새해 인사 DM", "note": "준비 중이에요" },
-    { "title": "보험 팁 DM", "note": "준비 중이에요" }
+    {
+      "title": "12월 DM",
+      "note": "곧 나와요"
+    },
+    {
+      "title": "새해 인사 DM",
+      "note": "준비 중이에요"
+    },
+    {
+      "title": "보험 팁 DM",
+      "note": "준비 중이에요"
+    }
   ]
 }
