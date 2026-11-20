@@ -1,0 +1,97 @@
+{
+  "title": "가을로 물드는 시간",
+  "month": "2026-11",
+  "themes": [
+    "season",
+    "health"
+  ],
+  "keywords": [
+    "가을",
+    "늦가을",
+    "단풍",
+    "낙엽",
+    "11월",
+    "환절기",
+    "일교차",
+    "건강",
+    "안부",
+    "햇살",
+    "햇빛",
+    "수면",
+    "생체리듬",
+    "아침",
+    "계절 인사"
+  ],
+  "status": "published",
+  "size": {
+    "width": 800,
+    "height": 1680
+  },
+  "thumbnail": "thumb.jpg",
+  "fileName": "11월DM",
+  "backgrounds": [
+    {
+      "id": "woman",
+      "label": "여성",
+      "file": "bg-woman.jpg",
+      "ppt": "dm.pptx"
+    }
+  ],
+  "pptText": {
+    "OOO": "{customerName}",
+    "김인카": "{agentName}",
+    "010.000.0000": "{agentPhone}"
+  },
+  "fields": [
+    "customerName",
+    "agentName",
+    "agentPhone"
+  ],
+  "texts": [
+    {
+      "text": "{customerName} 고객님께",
+      "x": 400,
+      "y": 295.0,
+      "maxWidth": 740,
+      "font": "buri",
+      "size": 56.4,
+      "color": "#111b5e",
+      "align": "center",
+      "letterSpacing": -2.12
+    },
+    {
+      "text": "{customerName}님의 하루하루에 따스함과 평안함이",
+      "x": 718.6,
+      "y": 1251.6,
+      "maxWidth": 700,
+      "font": "dotum",
+      "size": 33.9,
+      "color": "#111b5e",
+      "align": "right",
+      "letterSpacing": -2.12
+    },
+    {
+      "text": "{agentName}",
+      "x": 725.3,
+      "y": 1402.0,
+      "maxWidth": 420,
+      "font": "dotum",
+      "weight": 700,
+      "size": 61.4,
+      "color": "#111b5e",
+      "align": "right"
+    },
+    {
+      "text": "{agentPhone}",
+      "x": 721.0,
+      "y": 1518.7,
+      "maxWidth": 420,
+      "font": "dotum",
+      "weight": 700,
+      "size": 45.2,
+      "color": "#111b5e",
+      "align": "right",
+      "letterSpacing": -2.12
+    }
+  ]
+}

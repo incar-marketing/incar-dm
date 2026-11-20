@@ -1,0 +1,71 @@
+/* tokens.css — 브랜드 값은 여기서만 바꿉니다 (CIS STUDIO와 같은 톤앤매너) */
+@font-face { font-family: "SUIT"; src: url("../fonts/SUIT-Regular.subset.woff2") format("woff2"); font-weight: 400 500; font-display: swap; }
+@font-face { font-family: "SUIT"; src: url("../fonts/SUIT-Bold.subset.woff2") format("woff2"); font-weight: 600 700; font-display: swap; }
+@font-face { font-family: "SUIT"; src: url("../fonts/SUIT-ExtraBold.subset.woff2") format("woff2"); font-weight: 800 900; font-display: swap; }
+/* DM 글자용 (캔버스에 그릴 때 사용) */
+@font-face { font-family: "buri"; src: url("../fonts/AritaBuriKR-Bold.subset.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "dotum"; src: url("../fonts/AritaDotumKR-Medium.subset.woff2") format("woff2"); font-display: swap; }
+
+:root {
+  /* 색 */
+  --color-primary: #102879;        /* 남색: 누르는 것, 제목 */
+  --color-primary-hover: #1c3a9e;
+  --color-accent: #fff953;         /* 레몬: 꼭 봐야 할 곳에만 */
+  --color-surface: #f2f6ff;        /* 연한 파랑 바탕 */
+  --color-page: #fefeff;
+  --color-white: #ffffff;
+  --color-line: #a8b7d8;
+  --color-line-soft: #dfe5f2;
+  --color-text: #1d2440;
+  --color-text-muted: #5e6d82;
+  --color-placeholder: #9aa6bd;
+  --color-disabled-bg: #e6e9f0;
+  --color-disabled-text: #9aa3b5;
+  --color-success: #157347;
+  --color-success-bg: #e9f7ef;
+  --color-success-line: #b7e3c8;
+  --color-error: #c2410c;
+  --color-new: #d9480f;
+  --color-draft: #7c3aed;
+  --color-mark: rgba(255, 214, 0, 0.45);
+  --color-focus: #2463eb;
+  --color-overlay: rgba(10, 16, 35, 0.55);
+
+  /* 글꼴 */
+  --font-sans: "SUIT", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --text-xs: 13px;
+  --text-sm: 15px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+
+  /* 간격 (8의 배수) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 40px;
+
+  /* 모서리 */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  /* 크기 */
+  --control-sm: 40px;
+  --control-md: 48px;
+  --control-lg: 56px;
+  --header-height: 64px;
+  --content-width: 1100px;
+
+  --shadow-card: 0 4px 18px rgba(16, 40, 121, 0.12);
+  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.28);
+  --transition: 0.15s ease;
+}
+
+@media (max-width: 767px) {
+  :root { --header-height: 56px; }
+}
