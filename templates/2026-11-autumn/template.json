@@ -51,7 +51,7 @@
     {
       "text": "{customerName} 고객님께",
       "x": 400,
-      "y": 295.0,
+      "y": 291.0,
       "maxWidth": 740,
       "font": "buri",
       "size": 56.4,
@@ -73,7 +73,7 @@
     {
       "text": "{agentName}",
       "x": 725.3,
-      "y": 1402.0,
+      "y": 1391.0,
       "maxWidth": 420,
       "font": "dotum",
       "weight": 700,
@@ -84,7 +84,7 @@
     {
       "text": "{agentPhone}",
       "x": 721.0,
-      "y": 1518.7,
+      "y": 1512.7,
       "maxWidth": 420,
       "font": "dotum",
       "weight": 700,
