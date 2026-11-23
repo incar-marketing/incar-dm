@@ -5,8 +5,8 @@
  *  - 여러 명: 휴대폰은 공유창, PC는 zip 파일 하나로
  * 외부 라이브러리 없이 브라우저 기본 기능만 씁니다.
  */
-import { assetUrl, PPT_TOKENS } from "./templates.js";
-import { renderToBlob } from "./renderer.js";
+import { assetUrl, PPT_TOKENS } from "./templates.js?v=20261123a";
+import { renderToBlob } from "./renderer.js?v=20261123a";
 
 /* ---------- zip 읽기·쓰기 (PPT 파일도 zip 구조입니다) ---------- */
 const CRC_TABLE = (() => {
@@ -128,7 +128,7 @@ function fillSlideXml(xml, replacements) {
  */
 async function loadPptFile(url) {
   const isZip = buffer => buffer.byteLength > 4 && new Uint8Array(buffer, 0, 2).every((b, i) => b === [0x50, 0x4b][i]);
-  const direct = await fetch(url).catch(() => null);
+  const direct = await fetch(url, { cache: "no-cache" }).catch(() => null);
   if (direct?.ok) {
     const buffer = await direct.arrayBuffer();
     if (isZip(buffer)) return buffer;

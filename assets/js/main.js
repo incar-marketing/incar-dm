@@ -3,11 +3,11 @@
  *   #/            DM 고르기
  *   #/dm/<폴더>    DM 만들기
  */
-import { loadCatalog } from "./templates.js";
-import { store } from "./store.js";
-import { openProfileModal, toast } from "./ui.js";
-import { renderGallery, resetGallery } from "./pages/gallery.js";
-import { renderEditor } from "./pages/editor.js";
+import { loadCatalog } from "./templates.js?v=20261123a";
+import { store } from "./store.js?v=20261123a";
+import { openProfileModal, toast } from "./ui.js?v=20261123a";
+import { renderGallery, resetGallery } from "./pages/gallery.js?v=20261123a";
+import { renderEditor } from "./pages/editor.js?v=20261123a";
 
 const app = document.getElementById("app");
 let catalog = null;

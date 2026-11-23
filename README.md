@@ -115,3 +115,7 @@ dm-studio/
 - **편집 항목 추가**(예: 한마디): `assets/js/templates.js`의 `FIELDS`에 한 줄 추가 → 그 항목을 쓸 템플릿의 `fields`와 `texts`에 추가.
 - **측정(GTM)**: `dataLayer`로 `dm_download`(template, format, count, background, logo), `dm_background`, `dm_logo` 이벤트를 보냅니다.
 - **지원 브라우저**: 최신 크롬·엣지·사파리·삼성 인터넷. 휴대폰에서는 사진을 공유창으로 카카오톡에 바로 보낼 수 있습니다.
+
+## 코드를 고친 뒤 꼭 할 일 (새 버전 바로 보이게)
+
+브라우저는 사이트 파일을 최대 10분 동안 저장해 두고 다시 씁니다. `assets/` 안의 JS·CSS를 고쳤다면 **`index.html`과 `assets/js/` 안의 `?v=20261123a` 같은 표시를 전부 새 값(예: 오늘 날짜)으로 바꿔** 주세요. 편집기의 '모두 바꾸기'로 한 번에 바꾸면 됩니다. 템플릿(JSON·이미지·PPT)만 바꿀 때는 필요 없습니다.
