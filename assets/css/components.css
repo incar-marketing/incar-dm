@@ -35,9 +35,6 @@
 .tab[aria-selected="true"] span { opacity: 1; color: var(--color-accent); }
 
 /* ----- 검색 ----- */
-.search { display: flex; align-items: center; gap: var(--space-2); width: 320px; height: var(--control-md); padding: 0 var(--space-3); border: 1.5px solid var(--color-line); border-radius: var(--radius-pill); background: var(--color-white); color: var(--color-text-muted); }
-.search:focus-within { border-color: var(--color-primary); }
-.search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: var(--color-text); }
 
 /* ----- DM 카드 (목록) ----- */
 .dm-card { min-width: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--color-line-soft); border-radius: var(--radius-lg); background: var(--color-white); transition: border-color var(--transition), box-shadow var(--transition); }
@@ -110,8 +107,7 @@
   .site-footer__inner { flex-direction: column; text-align: center; }
   .site-footer__info { text-align: center; }
   .page-title { font-size: var(--text-xl); }
-  .search { width: 100%; }
-  .tab { height: var(--control-sm); padding: 0 var(--space-3); font-size: var(--text-sm); }
+    .tab { height: var(--control-sm); padding: 0 var(--space-3); font-size: var(--text-sm); }
   .dm-card { border-radius: var(--radius-md); }
   .dm-card__thumb { height: 200px; }
   .dm-card__meta { padding: var(--space-2) var(--space-2) var(--space-1); }
