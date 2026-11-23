@@ -42,7 +42,7 @@ export function renderEditor(root, template, catalog, nav) {
           ${isDraft
             ? `<p class="notice notice--draft">아직 <b>시안</b>이라 저장은 막아 두었어요.</p>`
             : `<div class="save__buttons">
-                <button type="button" class="btn btn--save" data-save="png"><strong><span class="pc-only">사진으로 저장</span><span class="m-only">사진</span></strong><span><span class="pc-only">카톡·문자용</span><span class="m-only"><i class="save__n"></i>카톡·문자</span></span></button>
+                <button type="button" class="btn btn--save" data-save="jpg"><strong><span class="pc-only">사진으로 저장</span><span class="m-only">사진</span></strong><span><span class="pc-only">카톡·문자용</span><span class="m-only"><i class="save__n"></i>카톡·문자</span></span></button>
                 <button type="button" class="btn btn--save" data-save="pptx"><strong><span class="pc-only">PPT로 저장</span><span class="m-only">PPT</span></strong><span><span class="pc-only">문구 직접 수정</span><span class="m-only"><i class="save__n"></i>문구 수정</span></span></button>
               </div>`}
         </div>
@@ -165,7 +165,7 @@ export function renderEditor(root, template, catalog, nav) {
   /* ----- 저장 후 ----- */
   function doneHtml() {
     const others = catalog.templates.filter(t => t.id !== template.id && t.status === "published").slice(0, 2);
-    const what = done.kind === "png" ? `사진 저장 완료 (${done.count}장)` : `PPT 저장 완료 (${done.count}개)`;
+    const what = done.kind === "jpg" ? `사진 저장 완료 (${done.count}장)` : `PPT 저장 완료 (${done.count}개)`;
     return `
       <div class="notice notice--done" role="status"><span>✓ ${what}</span>
         <button type="button" class="btn btn--outline btn--sm" data-action="again">다시 만들기</button></div>
@@ -211,7 +211,7 @@ export function renderEditor(root, template, catalog, nav) {
       paintBody();
       if (result.status === "saved") {
         toast(result.zipped ? `${result.count}명 파일을 압축 파일(zip) 하나로 저장했어요`
-          : kind === "png" ? "사진을 저장했어요 (사진첩·다운로드 폴더)" : "PPT 파일을 저장했어요");
+          : kind === "jpg" ? "사진을 저장했어요 (사진첩·다운로드 폴더)" : "PPT 파일을 저장했어요");
       }
       if (kind === "pptx" && !result.filled) toast("이 기기에서는 이름을 넣지 못해 원본 PPT로 저장했어요");
     } catch (error) {

@@ -144,5 +144,5 @@ export async function renderDM(canvas, template, values, options) {
 export async function renderToBlob(template, values, options) {
   const canvas = await renderDM(document.createElement("canvas"), template, values, { ...options, preview: false });
   return new Promise((resolve, reject) =>
-    canvas.toBlob(blob => (blob ? resolve(blob) : reject(new Error("이미지를 만들지 못했어요"))), "image/png"));
+    canvas.toBlob(blob => (blob ? resolve(blob) : reject(new Error("이미지를 만들지 못했어요"))), "image/jpeg", 0.92));
 }

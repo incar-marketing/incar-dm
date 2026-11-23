@@ -192,8 +192,11 @@ export async function saveFile(name, blob) {
 /** 휴대폰(앱 밖 브라우저)에서는 공유창으로 카카오톡에 바로 보낼 수 있어요 */
 export const canShareFiles = (() => {
   try {
-    return window.top === window && !!navigator.canShare &&
-      navigator.canShare({ files: [new File([""], "a.png", { type: "image/png" })] });
+    // 휴대폰에서만 공유창을 씁니다. PC(윈도우 공유창 등)에서는 그냥 다운로드합니다.
+    const isPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+    return isPhone && window.top === window && !!navigator.canShare &&
+      navigator.canShare({ files: [new File([""], "a.jpg", { type: "image/jpeg" })] });
   } catch {
     return false;
   }
@@ -202,7 +205,7 @@ export const canShareFiles = (() => {
 const safeName = text => String(text).replace(/[\\/:*?"<>|]/g, "").trim();
 
 /**
- * @param {"png"|"pptx"} kind
+ * @param {"jpg"|"pptx"} kind
  * @param {object} template
  * @param {Array<object>} people   고객별 values
  * @param {object} choice  { background, logo }
@@ -216,9 +219,9 @@ export async function createAndSave(kind, template, people, choice, onProgress) 
   let filled = true;
   for (const [index, values] of people.entries()) {
     onProgress?.(index + 1, people.length);
-    if (kind === "png") {
+    if (kind === "jpg") {
       const blob = await renderToBlob(template, values, choice);
-      files.push(new File([blob], safeName(`${base}_${values.customerName}고객님.png`), { type: "image/png" }));
+      files.push(new File([blob], safeName(`${base}_${values.customerName}고객님.jpg`), { type: "image/jpeg" }));
     } else {
       const result = await makePPT(template, background, values);
       filled = filled && result.filled;
@@ -226,7 +229,7 @@ export async function createAndSave(kind, template, people, choice, onProgress) 
     }
   }
 
-  if (kind === "png" && canShareFiles && navigator.canShare({ files })) {
+  if (kind === "jpg" && canShareFiles && navigator.canShare({ files })) {
     try {
       await navigator.share({ files, title: template.title });
       return { status: "shared", count: files.length };
@@ -238,7 +241,7 @@ export async function createAndSave(kind, template, people, choice, onProgress) 
     return { status: await saveFile(files[0].name, files[0]), count: 1, filled };
   }
   const zipFiles = await Promise.all(files.map(async file => ({ name: file.name, data: new Uint8Array(await file.arrayBuffer()) })));
-  const label = kind === "png" ? "사진" : "PPT";
+  const label = kind === "jpg" ? "사진" : "PPT";
   const status = await saveFile(`${base}_${label}${files.length}개.zip`, makeZip(zipFiles));
   return { status, count: files.length, filled, zipped: true };
 }
