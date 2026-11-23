@@ -109,11 +109,11 @@
   .page-title { font-size: var(--text-xl); }
     .tab { height: var(--control-sm); padding: 0 var(--space-3); font-size: var(--text-sm); }
   .dm-card { border-radius: var(--radius-md); }
-  .dm-card__thumb { height: 200px; }
+  .dm-card__thumb { height: 320px; }
   .dm-card__meta { padding: var(--space-2) var(--space-2) var(--space-1); }
   .dm-card__meta strong { font-size: var(--text-sm); }
   .dm-card__go { margin: 0 var(--space-2) var(--space-2); min-height: 44px; }
-  .dm-card--soon { min-height: 140px; }
+  .dm-card--soon { min-height: 96px; }
   .dm-row { flex-wrap: wrap; }
   .dm-row .btn { width: 100%; }
   .modal__box { padding: var(--space-4); gap: var(--space-3); }
