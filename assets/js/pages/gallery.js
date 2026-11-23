@@ -1,7 +1,7 @@
 /**
  * pages/gallery.js — DM 고르기: 테마 탭 · DM 카드
  */
-import { cardHtml, upcomingHtml, escapeHtml } from "../ui.js?v=20261123b";
+import { cardHtml, upcomingHtml, escapeHtml } from "../ui.js?v=20261123d";
 
 const state = { theme: "all" };
 
@@ -46,7 +46,14 @@ export function renderGallery(root, catalog, openTemplate) {
   // 클릭은 화면 바깥 상자 하나에서 처리합니다 (카드가 다시 그려져도 리스너가 늘지 않음)
   root.querySelector(".gallery").addEventListener("click", event => {
     const tab = event.target.closest("[data-theme]");
-    if (tab) { state.theme = tab.dataset.theme; return paint(); }
+    if (tab) {
+      state.theme = tab.dataset.theme;
+      paint();
+      // 아래로 내려 둔 채 탭을 바꾸면 목록 처음으로 (탭은 상단에 붙어 있음)
+      const top = root.querySelector(".gallery__grid").getBoundingClientRect().top + window.scrollY - tab.parentElement.offsetHeight - 80;
+      if (window.scrollY > top) window.scrollTo({ top: Math.max(0, top), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      return;
+    }
     const open = event.target.closest("[data-open]");
     if (open) return openTemplate(open.dataset.open);
     if (event.target.closest("[data-reset]")) { state.theme = "all"; paint(); }
