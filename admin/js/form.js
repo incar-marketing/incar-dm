@@ -6,12 +6,13 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, FONTS, STATUSES, validate, fetchJSON } from "../../assets/js/templates.js?v=20261125a";
-import { renderDM } from "../../assets/js/renderer.js?v=20261125a";
-import { escapeHtml, setBusy } from "../../assets/js/ui.js?v=20261125a";
-import { saveChanges, jsonFile } from "./api.js?v=20261125a";
-import { confirmDialog } from "./dialog.js?v=20261125a";
-import { prepareBackground, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261125a";
+import { FIELDS, FONTS, STATUSES, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127a";
+import { renderDM } from "../../assets/js/renderer.js?v=20261127a";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127a";
+import { saveChanges, jsonFile } from "./api.js?v=20261127a";
+import { confirmDialog } from "./dialog.js?v=20261127a";
+import { readPptLayout } from "./pptx.js?v=20261127a";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127a";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };
@@ -54,6 +55,9 @@ export async function renderForm(root, { manifest, templates, template, onDone }
   const themeIds = new Set(manifest.themes.map(theme => theme.id));
   let folder = template?.folder || "";
   let newBackground = null;   // 새로 올린 배경 { blob, url, width, height }
+  let newPpt = null;          // 새로 올린 PPT 파일과 읽은 값 { file, ratio, pptText, marks }
+  let cleanedBackground = null; // 표시 글자를 지운 배경 { blob, url, width, height }
+  let eraseOn = true;           // '배경 그림에 찍힌 표시 지우기'
   let selected = 0;           // 미리보기를 누르면 옮겨질 글자 줄
   let dirty = false;
 
@@ -98,6 +102,11 @@ export async function renderForm(root, { manifest, templates, template, onDone }
             <div class="field"><label for="f-bg">${isNew ? "배경 그림 올리기" : "배경 그림 바꾸기"}</label>
               <input class="input input--file" id="f-bg" type="file" accept="image/jpeg,image/png,image/webp">
               <span class="field__hint">이름·연락처 자리를 비워 둔 그림을 올려 주세요. 가로 ${IMAGE_RULES.backgroundWidth}px을 권장하고, 더 크면 자동으로 줄여요. 목록용 작은 그림(썸네일)은 저장할 때 미리보기로 자동으로 만들어져요.</span></div>
+            <div class="field"><label for="f-ppt">PPT 파일 (선택)</label>
+              <input class="input input--file" id="f-ppt" type="file" accept=".pptx">
+              <span class="field__hint">PPT의 이름 자리에 <b>{고객명} {설계사}(또는 {설계사명}) 010.0000.0000(또는 {연락처})</b>를 적어 두면, 그 위치·크기·색을 읽어 아래 글자 자리를 자동으로 채워요. 같은 PPT로 설계사의 PPT 저장도 돼요.${draft.backgrounds[0].ppt ? ` (지금 파일: ${escapeHtml(draft.backgrounds[0].ppt)})` : ""}</span>
+              <label class="check"><input type="checkbox" name="eraseMarkers" checked> 배경 그림에 찍힌 표시 글자는 자동으로 지우기</label>
+              <span class="field__hint">PPT를 그대로 내보낸 그림을 올려도 돼요. 표시 양옆 색으로 채워서 단색·그라데이션 배경에서는 깔끔해요. 사진·무늬 위라 티가 나면 끄고, 표시를 지운 그림을 올려 주세요.</span></div>
           </section>
 
           <section class="form-card">
@@ -212,6 +221,7 @@ export async function renderForm(root, { manifest, templates, template, onDone }
       draft.status = input.value;
       form.querySelector("[data-status-hint]").textContent = STATUS_HINT[input.value];
     } else if (input.name === "folder") folder = input.value.trim();
+    else if (input.name === "eraseMarkers") { eraseOn = input.checked; refreshBackground(); }
     else if (input.name) draft[input.name] = input.value.trim();
   }
 
@@ -224,17 +234,60 @@ export async function renderForm(root, { manifest, templates, template, onDone }
     drawPreview();
   });
 
+  /** 배경 그림과 PPT 슬라이드의 세로/가로 비율이 다르면 글자 위치가 어긋나므로 알려 줍니다 */
+  function warnIfRatioDiffers() {
+    if (!newPpt) return;
+    const imageRatio = draft.size.height / draft.size.width;
+    if (Math.abs(imageRatio - newPpt.ratio) / newPpt.ratio > 0.02) toast("배경 그림과 PPT 슬라이드의 비율이 달라요. 같은 PPT에서 내보낸 그림인지 확인해 주세요");
+  }
+
+  /** 미리보기·저장에 쓸 배경: PPT 표시를 지운 그림 > 새로 올린 그림 > 원래 그림 */
+  async function refreshBackground() {
+    if (cleanedBackground) URL.revokeObjectURL(cleanedBackground.url);
+    cleanedBackground = null;
+    if (newPpt && eraseOn && (newBackground || !isNew)) {
+      try {
+        const source = newBackground?.blob || await fetch(`templates/${folder}/${draft.backgrounds[0].file}`, { cache: "no-cache" }).then(r => r.blob());
+        cleanedBackground = await eraseMarks(source, newPpt.marks, DM_WIDTH);
+      } catch (error) {
+        console.error(error);
+        toast("배경 그림의 표시를 지우지 못했어요. 표시를 지운 그림을 올려 주세요");
+      }
+    }
+    const shown = cleanedBackground || newBackground;
+    if (shown) draft.backgrounds[0].src = shown.url;
+    else delete draft.backgrounds[0].src;
+    drawPreview();
+  }
+
+  async function usePpt(file) {
+    const layout = await readPptLayout(file, DM_WIDTH);
+    if (!layout.texts.length) throw new Error("PPT에서 {고객명} · {설계사명} · {연락처} 표시를 찾지 못했어요. 이름 자리에 이 표시를 적어 주세요");
+    newPpt = { file, ratio: layout.ratio, pptText: layout.pptText, marks: layout.marks };
+    draft.texts = layout.texts;
+    selected = 0;
+    dirty = true;
+    drawLines();
+    await refreshBackground();
+    // {설계사}·010.0000.0000 처럼 다른 글자로 표시한 자리는 '없는 표시'에서 뺍니다
+    const aliasFor = { "{설계사명}": "{agentName}", "{연락처}": "{agentPhone}" };
+    const missing = layout.missing.filter(token => !Object.values(layout.pptText).includes(aliasFor[token]));
+    toast(`PPT에서 글자 자리 ${layout.texts.length}개를 읽었어요. 미리보기로 확인해 주세요${missing.length ? ` (없는 표시: ${missing.join(" ")})` : ""}`);
+    if (!isNew || newBackground) warnIfRatioDiffers();
+  }
+
   form.addEventListener("change", async event => {
     if (event.target.type !== "file" || !event.target.files[0]) return;
     try {
+      if (event.target.id === "f-ppt") return await usePpt(event.target.files[0]);
       const prepared = await prepareBackground(event.target.files[0]);
       if (newBackground) URL.revokeObjectURL(newBackground.url);
       newBackground = prepared;
       // 글자 위치는 가로 800 기준이라, 세로는 그림 비율에 맞춥니다
       draft.size = { width: DM_WIDTH, height: Math.round(DM_WIDTH * prepared.height / prepared.width) };
-      draft.backgrounds[0].src = prepared.url;
       dirty = true;
-      drawPreview();
+      await refreshBackground();
+      warnIfRatioDiffers();
     } catch (error) {
       event.target.value = "";
       showErrors([error.message]);
@@ -321,12 +374,22 @@ export async function renderForm(root, { manifest, templates, template, onDone }
     const saved = structuredClone(draft);
     saved.thumbnail = "thumb.jpg";
     delete saved.backgrounds[0].src;
-    if (newBackground) {
+    const finalBackground = cleanedBackground || newBackground;
+    if (finalBackground) {
       const oldFile = saved.backgrounds[0].file;
       saved.backgrounds[0].file = "bg.jpg";
-      write.push({ path: `${dir}bg.jpg`, base64: await blobToBase64(newBackground.blob) });
+      write.push({ path: `${dir}bg.jpg`, base64: await blobToBase64(finalBackground.blob) });
       // 예전 배경 파일 이름이 달랐고 다른 배경이 쓰지 않으면 지웁니다
       if (!isNew && oldFile !== "bg.jpg" && !saved.backgrounds.some(bg => bg.file === oldFile)) remove.push(`${dir}${oldFile}`);
+    }
+    if (newPpt) {
+      const oldPpt = saved.backgrounds[0].ppt;
+      saved.backgrounds[0].ppt = "dm.pptx";
+      // 예전 PPT용 글자 바꾸기는 버리고, 이번 PPT에서 찾은 글자(010.0000.0000 등)만 남깁니다
+      if (Object.keys(newPpt.pptText).length) saved.pptText = newPpt.pptText;
+      else delete saved.pptText;
+      write.push({ path: `${dir}dm.pptx`, base64: await blobToBase64(newPpt.file) });
+      if (!isNew && oldPpt && oldPpt !== "dm.pptx" && !saved.backgrounds.some(bg => bg.ppt === oldPpt)) remove.push(`${dir}${oldPpt}`);
     }
     write.push(jsonFile(`${dir}template.json`, saved));
     if (isNew) write.push(jsonFile("templates/manifest.json", { ...manifest, templates: [{ folder }, ...manifest.templates] }));

@@ -4,7 +4,7 @@
  *
  * 그리는 순서: 배경 이미지(고정 문구 포함) → 바뀌는 글자(texts) → 회사 로고
  */
-import { assetUrl } from "./templates.js?v=20261125a";
+import { assetUrl } from "./templates.js?v=20261127a";
 
 /** DM 안에 들어가는 회사 로고 모양. car = 로고 그림 안 'CAR' 글자의 위·아래 위치(px) */
 export const LOGO_SHAPES = [

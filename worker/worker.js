@@ -20,16 +20,18 @@
  */
 
 const LIMITS = {
-  bodyBytes: 20 * 1024 * 1024,   // 한 번 저장 요청 전체
+  bodyBytes: 30 * 1024 * 1024,   // 한 번 저장 요청 전체 (PPT + 그림)
   imageBytes: 5 * 1024 * 1024,   // 그림 한 장
+  pptBytes: 15 * 1024 * 1024,    // PPT 한 개
   jsonBytes: 200 * 1024,         // 설정 파일 한 개
   files: 20                      // 한 번에 쓰거나 지울 파일 수
 };
 const SERVE_PREFIXES = ["admin/", "assets/", "templates/"];   // GET 으로 보여 줄 폴더 (worker/ 등은 제외)
 const FOLDER = "[a-z0-9][a-z0-9-]*";                            // 관리자 화면 폴더 이름 규칙과 같음
-const WRITABLE = new RegExp(`^templates/(manifest\\.json|${FOLDER}/[a-z0-9][a-z0-9._-]*\\.(json|jpe?g|png|webp))$`);
+const WRITABLE = new RegExp(`^templates/(manifest\\.json|${FOLDER}/[a-z0-9][a-z0-9._-]*\\.(json|jpe?g|png|webp|pptx))$`);
 const REMOVABLE = new RegExp(`^templates/${FOLDER}/([a-z0-9][a-z0-9._-]*\\.(json|jpe?g|png|webp|pptx))?$`);   // "/"로 끝나면 폴더째
 const IMAGE_SIGNATURES = [[0xff, 0xd8, 0xff], [0x89, 0x50, 0x4e, 0x47], [0x52, 0x49, 0x46, 0x46]];        // JPG, PNG, WEBP
+const PPT_SIGNATURE = [0x50, 0x4b, 0x03, 0x04];                                                            // PPTX(zip)
 const TYPES = {
   html: "text/html; charset=utf-8", css: "text/css; charset=utf-8", js: "text/javascript; charset=utf-8",
   json: "application/json; charset=utf-8", svg: "image/svg+xml", png: "image/png", jpg: "image/jpeg",
@@ -128,11 +130,18 @@ function checkJsonFile(path, text) {
   }
 }
 
-function checkImageFile(path, base64) {
+/** 그림·PPT: 파일 앞부분(시그니처)으로 실제 형식을 확인하고 크기를 제한합니다 */
+function checkBinaryFile(path, base64) {
   let bytes;
-  try { bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0)); } catch { throw new HttpError(400, `${path} 그림을 읽지 못했어요`); }
+  try { bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0)); } catch { throw new HttpError(400, `${path} 파일을 읽지 못했어요`); }
+  const matches = signature => signature.every((byte, i) => bytes[i] === byte);
+  if (path.endsWith(".pptx")) {
+    if (bytes.length > LIMITS.pptBytes) throw new HttpError(400, `${path} PPT가 너무 커요 (15MB 이하)`);
+    if (!matches(PPT_SIGNATURE)) throw new HttpError(400, `${path} 는 PPT 파일이 아니에요`);
+    return;
+  }
   if (bytes.length > LIMITS.imageBytes) throw new HttpError(400, `${path} 그림이 너무 커요 (5MB 이하)`);
-  if (!IMAGE_SIGNATURES.some(signature => signature.every((byte, i) => bytes[i] === byte))) throw new HttpError(400, `${path} 는 그림 파일이 아니에요`);
+  if (!IMAGE_SIGNATURES.some(matches)) throw new HttpError(400, `${path} 는 그림 파일이 아니에요`);
 }
 
 function checkChanges(changes) {
@@ -147,7 +156,7 @@ function checkChanges(changes) {
     if (!file || !WRITABLE.test(file.path || "") || seen.has(file.path)) throw new HttpError(400, `저장할 수 없는 위치예요: ${file?.path}`);
     seen.add(file.path);
     if (file.path.endsWith(".json")) checkJsonFile(file.path, file.text);
-    else checkImageFile(file.path, file.base64);
+    else checkBinaryFile(file.path, file.base64);
   }
   for (const path of remove) {
     if (typeof path !== "string" || !REMOVABLE.test(path) || [...seen].some(written => written.startsWith(path))) {
