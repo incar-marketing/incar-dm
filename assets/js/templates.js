@@ -8,6 +8,9 @@
 
 const ROOT = "templates/";
 
+/** 공개 상태: published 공개 · draft 시안(목록에 보이지만 저장 막힘) · hidden 비공개(목록에서 빠짐) */
+export const STATUSES = ["published", "draft", "hidden"];
+
 /** 편집 항목 정의: 모든 템플릿이 함께 씁니다. 형식을 바꾸면 모든 DM에 한 번에 반영됩니다. */
 export const FIELDS = {
   customerName: { label: "고객 이름", placeholder: "고객명", source: "customer", maxLength: 20 },
@@ -22,7 +25,7 @@ export const PPT_TOKENS = {
   agentPhone: "{연락처}"
 };
 
-const FONTS = ["buri", "dotum", "script", "suit"];
+export const FONTS = ["buri", "dotum", "script", "suit"];
 
 export function formatPhone(value) {
   const digits = String(value || "").replace(/\D/g, "").slice(0, 11);
@@ -32,12 +35,13 @@ export function formatPhone(value) {
   return `${digits.slice(0, 3)}.${digits.slice(3, 7)}.${digits.slice(7)}`;
 }
 
-/** 설정 검사: 문제 목록을 돌려줍니다. 빈 배열이면 통과. */
-function validate(t, themeIds) {
+/** 설정 검사: 문제 목록을 돌려줍니다. 빈 배열이면 통과. (관리자 페이지도 저장 전에 같은 검사를 씁니다) */
+export function validate(t, themeIds) {
   const problems = [];
   const need = (ok, message) => { if (!ok) problems.push(message); };
   need(typeof t.title === "string" && t.title.trim(), "title(제목)이 없어요");
-  need(/^\d{4}-\d{2}$/.test(t.month || ""), "month 는 \"2026-11\" 형식이어야 해요");
+  need(/^\d{4}-\d{2}-\d{2}$/.test(t.uploadedAt || ""), "uploadedAt(업로드 날짜)은 \"2026-11-24\" 형식이어야 해요");
+  need(t.showNew === undefined || typeof t.showNew === "boolean", "showNew 는 true 또는 false 여야 해요");
   need(Array.isArray(t.themes) && t.themes.length && t.themes.every(id => themeIds.has(id)),
     `themes 는 manifest 의 테마 id 중에서 골라야 해요 (${[...themeIds].join(", ")})`);
   need(t.size && t.size.width > 0 && t.size.height > 0, "size.width / size.height 가 없어요");
@@ -47,13 +51,13 @@ function validate(t, themeIds) {
   need(Array.isArray(t.texts) && t.texts.every(item =>
     typeof item.text === "string" && Number.isFinite(item.x) && Number.isFinite(item.y) && FONTS.includes(item.font) && item.size > 0),
   "texts 의 각 줄에는 text, x, y, font(buri/dotum/script/suit), size 가 필요해요");
-  need(["published", "draft"].includes(t.status), "status 는 published 또는 draft 여야 해요");
+  need(STATUSES.includes(t.status), `status 는 ${STATUSES.join(", ")} 중 하나여야 해요`);
   need(t.pptText === undefined || (t.pptText && typeof t.pptText === "object" && Object.values(t.pptText).every(v => typeof v === "string")),
     "pptText 는 { \"PPT 안의 글자\": \"{customerName}\" } 모양이어야 해요");
   return problems;
 }
 
-async function fetchJSON(path) {
+export async function fetchJSON(path) {
   const response = await fetch(path, { cache: "no-cache" });
   if (!response.ok) throw new Error(`${path} 를 찾을 수 없어요 (${response.status})`);
   return response.json();
@@ -62,11 +66,16 @@ async function fetchJSON(path) {
 /** 템플릿 경로 안의 파일 주소 */
 export const assetUrl = (template, file) => `${ROOT}${template.folder}/${file}`;
 
-export async function loadCatalog() {
+/**
+ * manifest.json(카테고리·순서)과 각 template.json(DM 내용)을 불러옵니다.
+ * @param {object} [options]
+ * @param {boolean} [options.includeHidden=false]  비공개 DM도 포함 (관리자 페이지용)
+ */
+export async function loadCatalog({ includeHidden = false } = {}) {
   const manifest = await fetchJSON(`${ROOT}manifest.json`);
   const themes = manifest.themes || [];
   const themeIds = new Set(themes.map(theme => theme.id));
-  const entries = (manifest.templates || []).filter(entry => entry.folder && !entry.hidden);
+  const entries = (manifest.templates || []).filter(entry => entry.folder);
 
   const results = await Promise.all(entries.map(async (entry, order) => {
     try {
@@ -76,6 +85,7 @@ export async function loadCatalog() {
         console.warn(`[DM STUDIO] templates/${entry.folder} 를 목록에서 뺐어요:\n- ${problems.join("\n- ")}`);
         return null;
       }
+      if (data.status === "hidden" && !includeHidden) return null;
       return { ...data, id: entry.folder, folder: entry.folder, order };
     } catch (error) {
       console.warn(`[DM STUDIO] templates/${entry.folder} 를 불러오지 못했어요: ${error.message}`);
@@ -83,21 +93,17 @@ export async function loadCatalog() {
     }
   }));
 
-  return {
-    themes,
-    upcoming: manifest.upcoming || [],
-    templates: results.filter(Boolean)
-  };
+  return { themes, templates: results.filter(Boolean) };
 }
 
-/** 이번 달 템플릿이면 NEW */
+/** NEW 표시: showNew 값을 따르고, 값이 없으면 이번 달에 올린 DM만 NEW */
 export function isNew(template) {
   const now = new Date();
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  return template.month === thisMonth;
+  return template.showNew ?? template.uploadedAt.startsWith(thisMonth);
 }
 
 export function monthLabel(template) {
-  const [year, month] = template.month.split("-");
+  const [year, month] = template.uploadedAt.split("-");
   return `${year}년 ${Number(month)}월`;
 }

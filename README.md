@@ -15,6 +15,17 @@ CIS STUDIO와 같은 톤앤매너(남색 #102879 · 레몬 #fff953 · SUIT 글�
 dm-studio/
 ├─ index.html                 화면 뼈대 (상단·본문·하단, 구글 태그매니저 GTM-NSV2ZG94)
 ├─ README.md                  이 문서
+├─ admin/                     ← 관리자 페이지 (사용자 화면과 같은 CSS·JS·템플릿 파일을 그대로 씀)
+│  ├─ index.html              관리자 화면 뼈대 (<base href="../"> 로 사이트 파일을 읽음)
+│  ├─ admin.css               관리자 전용 스타일 (모든 규칙이 .admin 아래 → 사용자 화면에 영향 없음)
+│  └─ js/
+│     ├─ main.js              시작점: DM 목록(순서·삭제) · 카테고리 · 화면 전환
+│     ├─ form.js              DM 등록·수정 (기본 정보·노출 설정·배경 그림·글자 자리·미리보기)
+│     ├─ images.js            올린 그림 검사·크기 줄이기·썸네일 자동 생성
+│     ├─ api.js               관리자 서버에 저장 요청 (저장 1번 = GitHub 커밋 1개)
+│     └─ dialog.js            삭제 등 되돌리기 어려운 작업 전 확인 창
+├─ worker/
+│  └─ worker.js               관리자 서버 (Cloudflare Workers에 붙여 넣는 파일 하나). 로그인 확인·파일 검사·GitHub 저장
 ├─ assets/                    ← 사이트 코드. 템플릿을 추가할 때는 열 일이 없습니다
 │  ├─ css/
 │  │  ├─ tokens.css           색·글꼴·간격·모서리 변수 (브랜드 값을 바꿀 때는 여기만)
@@ -34,16 +45,18 @@ dm-studio/
 │  ├─ fonts/                  SUIT(화면) · 아리따 부리·돋움(DM 글자) — 한글 2,350자만 담은 woff2
 │  └─ images/                 사이트 로고, DM에 들어가는 공식 로고(logo/)·KOSDAQ 마크
 └─ templates/                 ← 담당자가 관리하는 곳
-   ├─ manifest.json           목록 순서 · 숨기기 · 테마 4개 · 준비 중 예고
+   ├─ manifest.json           카테고리(themes) · DM 목록 순서(templates) 만
    ├─ _sample/                새 DM을 만들 때 복사해 쓰는 본 (목록에는 안 나옴)
    └─ 2026-11-autumn/         DM 하나 = 폴더 하나
-      ├─ template.json        제목·테마·검색어·글자 자리·로고 자리
+      ├─ template.json        제목·업로드 날짜·NEW·공개 상태·카테고리·글자 자리 (DM 하나의 정보는 모두 여기)
       ├─ thumb.jpg            목록 카드용 작은 그림 (가로 360px 정도)
       ├─ bg-woman.jpg         배경 (고정 문구까지 들어간 그림)
       └─ dm.pptx              디자이너가 준 PPT 원본 그대로 (OOO 자리에 이름이 들어감)
 ```
 
 ## 2. 새 DM(템플릿) 추가하기
+
+> **관리자 페이지가 연결된 뒤에는 관리자 페이지에서 등록·수정하세요.** (6장) 아래는 파일을 직접 고치는 방법입니다.
 
 1. `templates/_sample` 폴더를 복사해서 이름을 바꿉니다. 예: `templates/2026-12-yearend`
    - 폴더 이름이 DM의 주소가 됩니다. 영어 소문자·숫자·`-`만 쓰세요.
@@ -54,14 +67,14 @@ dm-studio/
    - **썸네일** `thumb.jpg`: 완성된 DM 모양(예시 이름이 들어간)을 가로 360px 정도로.
    - **PPT** (`dm.pptx`): 디자이너가 준 파일을 그대로 넣어도 됩니다. 이름 자리의 글자(예: `OOO`)는 `template.json`의 `pptText`에 적어 줍니다. (4장 참고)
 3. `template.json`을 고칩니다.
-   - `title` 제목, `month` `"2026-12"` 형식(이번 달이면 NEW가 자동으로 붙음), `themes` 테마 id, `keywords` 검색어
+   - `title` 제목, `uploadedAt` 업로드 날짜 `"2026-12-01"` 형식, `showNew` NEW 표시(`true`/`false`, 없으면 이번 달 DM만 NEW), `themes` 카테고리 id, `keywords` 검색어(지금 화면에는 검색이 없어 쓰이지 않음)
    - `backgrounds`: 배경 하나당 `{ "id", "label", "file", "ppt" }`. 지금 화면에는 배경 고르기가 없어서(시안에서 뺌) 첫 번째 배경이 쓰입니다.
    - `texts`: 바뀌는 글자 한 줄당 하나. `{customerName}`·`{agentName}`·`{agentPhone}`이 그 자리에 들어갑니다.
      - `x`, `y`: 글자 줄의 **가운데 높이**와 기준점(px, 800×1680 기준). `align`이 `right`면 x가 오른쪽 끝, `center`면 가운데.
      - `font`: `buri`(아리따 부리) / `dotum`(아리따 돋움), `size` 글자 크기, `color`, `weight`(굵기), `letterSpacing`(자간)
      - `maxWidth`: 이름이 길면 이 폭에 맞춰 글자가 자동으로 작아집니다.
    - `logo`: 로고가 들어갈 칸(`x`,`y`,`w`,`h`)과 색(`blue-solid`·`blue`·`white`), `kosdaq: true`면 KOSDAQ 마크가 'CAR' 글자 높이에 맞춰 붙습니다. 설계사가 고른 로고 모양(가로형·브랜드철학·국문조합·심볼만)이 이 칸에 맞춰 들어갑니다. 로고가 필요 없으면 `logo` 줄을 지우세요.
-   - `status`: 확인 중에는 `"draft"`(시안 표시, 저장 막힘), 공개할 때 `"published"`
+   - `status`: `"published"` 공개 · `"draft"` 시안(목록에 '시안'으로 보이고 저장 막힘) · `"hidden"` 비공개(목록에서 빠짐)
 4. `templates/manifest.json`의 `templates`에 한 줄 추가합니다. **위에 있을수록 목록 앞에 나옵니다.**
    ```json
    "templates": [
@@ -81,9 +94,8 @@ dm-studio/
 | 고정 문구·그림 | 그 폴더의 배경 그림을 새로 만들어 같은 이름으로 덮어쓰기 + `thumb.jpg`도 교체 |
 | 이름이 들어가는 자리·크기·색 | `template.json`의 `texts` |
 | 목록 순서 | `manifest.json`의 줄 순서 |
-| 잠깐 숨기기 | `manifest.json`에서 그 줄에 `"hidden": true` |
+| 잠깐 숨기기 | 그 폴더 `template.json`의 `status`를 `"hidden"` |
 | 완전히 지우기 | `manifest.json`에서 줄을 지우고 폴더를 삭제 |
-| 준비 중 예고 카드 | `manifest.json`의 `upcoming` |
 | 테마 이름·추가 | `manifest.json`의 `themes` (id를 바꾸면 그 id를 쓰는 DM도 함께 고쳐야 함) |
 
 한 폴더만 고치므로 다른 DM에는 영향이 없습니다.
@@ -108,7 +120,7 @@ dm-studio/
 ## 5. 배포와 유지보수 주의사항
 
 - **올리는 법**: 이 폴더 전체를 GitHub 저장소에 올리고, Settings → Pages 에서 배포합니다. 고친 뒤 1~2분 지나 새로고침하세요.
-- **PC에서 미리 확인**: `index.html`을 더블클릭해 열면 목록이 비어 보입니다(브라우저 보안 규칙상 `file://`에서는 설정 파일을 못 읽음). 저장소에 올려 확인하거나, 폴더에서 `python -m http.server` 를 실행한 뒤 `http://localhost:8000` 으로 여세요.
+- **PC에서 미리 확인**: `index.html`을 더블클릭해 열면 목록이 비어 보입니다(브라우저 보안 규칙상 `file://`에서는 설정 파일을 못 읽음). 저장소에 올려 확인하거나, 폴더에서 `python -m http.server` 를 실행한 뒤 `http://localhost:8000` 으로 여세요. 관리자 화면은 `http://localhost:8000/admin/` 에서 볼 수 있지만, 저장 서버가 없어 저장은 안 됩니다.
 - **JSON 쉼표 주의**: `template.json`·`manifest.json`에서 마지막 줄 뒤 쉼표(`,`)나 빠진 따옴표가 가장 흔한 실수입니다. 틀리면 그 DM만 빠지고 콘솔에 알려 줍니다.
 - **글꼴**: 화면·DM 글꼴은 한글 2,350자만 담았습니다. 아주 드문 글자가 이름에 들어가면 그 글자만 기본 글꼴로 보일 수 있습니다. PPT 글꼴은 ‘Arita Buri KR’·‘Arita Dotum KR’이라, 이 글꼴이 없는 PC에서는 비슷한 글꼴로 보입니다.
 - **브랜드 색·간격 변경**: `assets/css/tokens.css`만 고치면 전체에 반영됩니다.
@@ -118,4 +130,87 @@ dm-studio/
 
 ## 코드를 고친 뒤 꼭 할 일 (새 버전 바로 보이게)
 
-브라우저는 사이트 파일을 최대 10분 동안 저장해 두고 다시 씁니다. `assets/` 안의 JS·CSS를 고쳤다면 **`index.html`과 `assets/js/` 안의 `?v=20261123a` 같은 표시를 전부 새 값(예: 오늘 날짜)으로 바꿔** 주세요. 편집기의 '모두 바꾸기'로 한 번에 바꾸면 됩니다. 템플릿(JSON·이미지·PPT)만 바꿀 때는 필요 없습니다.
+브라우저는 사이트 파일을 최대 10분 동안 저장해 두고 다시 씁니다. `assets/`·`admin/` 안의 JS·CSS를 고쳤다면 **`index.html`, `assets/js/`, `admin/` 안의 `?v=20261125a` 같은 표시를 전부 새 값(예: 오늘 날짜)으로 바꿔** 주세요. 편집기의 '모두 바꾸기'로 한 번에 바꾸면 됩니다. 템플릿(JSON·이미지·PPT)만 바꿀 때는 필요 없습니다.
+
+## 6. 관리자 페이지
+
+주소: `https://<Worker 이름>.<계정 하위 도메인>.workers.dev/admin/` — 등록된 이메일로 받은 코드로 로그인합니다. (처음 설정은 7장)
+
+저장하면 GitHub 커밋 하나가 생기고, 관리자 화면에는 바로, 사용자 사이트(GitHub Pages)에는 1~2분 뒤 반영됩니다.
+
+| 메뉴 | 할 수 있는 일 |
+| --- | --- |
+| DM 목록 | ↑↓로 순서 바꾸고 [순서 저장] · [수정] · [삭제](확인 창 뒤 폴더째 삭제) · [+ 새 DM 등록] |
+| 카테고리 | 이름 바꾸기 · 순서 바꾸기 · 추가 · 삭제(그 카테고리를 쓰는 DM이 있으면 삭제 막힘) |
+| DM 등록·수정 | 제목 · 폴더 이름(새 DM만) · 업로드 날짜 · 저장 파일 이름 · 카테고리 · 공개 상태 · NEW · 배경 그림 · 글자 줄(내용·위치·크기·최대 폭·자간·정렬·글꼴·굵기·색) |
+
+- **미리보기**는 사용자 화면과 같은 그리기 함수(`renderer.js`)를 써서 실제 DM과 똑같이 보입니다. 글자 줄을 고르고 미리보기를 누르면 그 줄이 누른 자리로 옮겨집니다.
+- **배경 그림**: JPG·PNG·WEBP, 10MB 이하, 가로 800px 이상. 파일 앞부분으로 실제 그림인지 확인하고, 가로 1200px 이하 JPG로 다시 저장해 `bg.jpg`로 올립니다. 예전 배경 파일 이름이 달랐다면(예: `bg-woman.jpg`) 그 DM에서 더 쓰지 않을 때만 지웁니다. 그림은 DM 폴더마다 따로라 다른 DM에 영향이 없습니다.
+- **썸네일**은 저장할 때 예시 값(홍길동·김인카·010.1234.5678)을 넣은 미리보기로 자동으로 만듭니다(가로 360px).
+- **입력 항목(`fields`)**은 글자 줄에 쓰인 표시(`{customerName}` 등)를 보고 자동으로 정합니다.
+- 입력칸에 없는 설정(`keywords`, `pptText`, `logo`, PPT 파일)은 그대로 둡니다. 이런 설정은 파일을 직접 고쳐 주세요(2~4장).
+- 저장 전 사용자 화면과 같은 설정 검사(`templates.js`의 `validate`)를 하고, 틀리면 저장하지 않습니다.
+- 두 사람이 **동시에** 같은 내용을 고치면 나중에 저장한 쪽으로 덮어써집니다. 동시에 고치지 않도록 해 주세요.
+- 실수로 지우거나 잘못 저장했다면 GitHub 저장소의 커밋 기록에서 이전 파일을 되살릴 수 있습니다.
+
+## 7. 관리자 서버 설정 (처음 한 번)
+
+구조: **관리자 → Cloudflare Access(이메일 코드 로그인) → Worker(`worker/worker.js`) → GitHub 저장소** → GitHub Pages(사용자 사이트)
+
+- Worker는 저장소의 최신 파일로 관리자 화면을 보여 주고, 저장 요청을 검사한 뒤 커밋 하나로 저장합니다.
+- 로그인은 Access가 먼저 막고, Worker가 Access 로그인 증명(JWT)의 서명·대상·만료를 서버에서 한 번 더 확인합니다.
+- 비밀 값(GitHub 토큰)은 코드에 없고 Cloudflare 환경변수에만 있습니다.
+
+### 7-1. GitHub 토큰 만들기
+GitHub → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token
+- Repository access: **Only select repositories → incar-dm** 하나만
+- Permissions → Repository permissions → **Contents: Read and write** (나머지는 건드리지 않음)
+- 만료일을 정해 두고, 만료되면 새로 만들어 7-3의 `GITHUB_TOKEN`만 바꿉니다.
+
+### 7-2. Worker 만들기
+1. Cloudflare 대시보드 → **Workers & Pages** → 새 Worker 만들기(기본 "Hello World") → 이름 예: `dm-studio-admin` → 배포
+2. 코드 편집 → 기존 코드를 지우고 `worker/worker.js` 내용을 전부 붙여 넣기 → 배포
+
+### 7-3. 환경변수 (Worker → Settings → Variables and Secrets)
+| 이름 | 종류 | 값 |
+| --- | --- | --- |
+| `GITHUB_TOKEN` | **Secret** | 7-1에서 만든 토큰 |
+| `GITHUB_REPO` | Text | `incar-marketing/incar-dm` |
+| `GITHUB_BRANCH` | Text | `main` (Pages가 배포하는 브랜치) |
+| `ACCESS_TEAM_DOMAIN` | Text | 7-4에서 나오는 팀 도메인 (예: `https://xxx.cloudflareaccess.com`) |
+| `ACCESS_AUD` | Text | 7-4에서 나오는 AUD 태그 |
+| `ADMIN_EMAILS` | Text (선택) | 저장을 허용할 이메일, 쉼표로 구분 |
+
+### 7-4. 로그인(Access) 켜기
+1. Worker → **Settings → Domains & Routes** → workers.dev 의 **Enable Cloudflare Access**
+2. 나오는 창의 **AUD 태그**와 **팀 도메인**을 7-3에 넣습니다.
+3. **Manage Cloudflare Access**에서 로그인할 이메일을 등록합니다.
+4. 같은 화면의 **Preview URLs(Version URLs)는 꺼 둡니다.** (켜 두어도 Worker가 로그인 없는 요청을 막지만, 쓸 일이 없습니다)
+
+### 7-5. 확인
+`https://<Worker 주소>/admin/` 접속 → 이메일 코드 로그인 → DM 하나의 제목을 바꿔 저장 → GitHub 저장소에 `[관리자] DM 수정: …` 커밋이 생기면 완료.
+
+## 8. 백업과 복구
+
+- **모든 저장이 GitHub 커밋으로 남습니다.** 따로 백업할 필요 없이 저장소 기록이 곧 백업입니다. 커밋 메시지는 `[관리자] DM 수정: 제목 (폴더)` 형식입니다. (관리자 이메일은 남기지 않습니다)
+- **한 파일만 되돌리기**: GitHub에서 그 파일 → History → 되돌릴 시점의 파일을 열어 내용을 복사해 다시 저장하거나, 관리자 화면에서 다시 고칩니다.
+- **한 번의 저장을 통째로 되돌리기**: GitHub에서 그 커밋을 Revert 합니다. (PC의 GitHub Desktop: History → 커밋 오른쪽 클릭 → Revert)
+- **지운 DM 되살리기**: 삭제 커밋을 Revert 하면 폴더와 목록이 함께 돌아옵니다.
+- 저장은 커밋 하나로 한 번에 반영되므로, 저장 도중 실패하면 저장소는 바뀌지 않습니다.
+- 사내 전산으로 옮길 때는 저장소 전체(파일 + 기록)를 옮기고, `worker/worker.js`의 'GitHub' 부분만 새 저장 방식에 맞게 바꾸면 됩니다.
+
+## 9. 오류 해결
+
+| 화면에 보이는 말 | 원인과 해결 |
+| --- | --- |
+| 저장 서버에 연결되지 않았어요 | 관리자 화면을 GitHub Pages 주소나 PC에서 열었어요. Worker 주소(`…workers.dev/admin/`)로 여세요. |
+| 로그인이 필요해요 / 로그인이 만료됐어요 | 새로고침해서 다시 이메일 코드로 로그인하세요. 계속되면 7-3의 `ACCESS_AUD`·`ACCESS_TEAM_DOMAIN` 값을 확인하세요. |
+| 관리자로 등록된 이메일이 아니에요 | 7-3의 `ADMIN_EMAILS`에 이메일을 넣거나 칸을 비우세요. |
+| 서버 설정이 빠졌어요: … | 7-3의 환경변수 중 말한 이름이 비어 있어요. |
+| GitHub 토큰이 만료됐거나 권한이 없어요 | 7-1대로 토큰을 새로 만들어 `GITHUB_TOKEN`을 바꾸세요. (저장소 선택·Contents 쓰기 권한 확인) |
+| 다른 저장과 겹쳤어요 | 그사이 다른 사람이 저장했어요. 새로고침 후 다시 저장하세요. (덮어쓰지 않도록 막아 둔 것) |
+| …는 그림 파일이 아니에요 / 너무 커요 | JPG·PNG·WEBP 그림만, 원본 10MB 이하로 올리세요. |
+| 사이트에 반영이 안 돼요 | GitHub Pages는 1~2분 걸립니다. 저장소 Actions 탭에서 배포가 끝났는지 확인하세요. |
+| 목록에서 DM 하나가 빠졌어요 | 브라우저 F12 → Console 의 `[DM STUDIO]` 경고가 무엇이 틀렸는지 알려 줍니다. 관리자 목록에는 '불러오지 못한 DM'으로 보입니다. |
+| Worker 오류 기록 보기 | Cloudflare → Worker → Logs. 파일 내용·이메일은 남기지 않고, 실패한 단계와 상태 코드만 남깁니다. |
+

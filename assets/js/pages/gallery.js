@@ -1,7 +1,7 @@
 /**
  * pages/gallery.js — DM 고르기: 테마 탭 · DM 카드
  */
-import { cardHtml, upcomingHtml, escapeHtml } from "../ui.js?v=20261123d";
+import { cardHtml, escapeHtml } from "../ui.js?v=20261125a";
 
 const state = { theme: "all" };
 
@@ -12,22 +12,22 @@ export function resetGallery() {
 
 /**
  * @param {HTMLElement} root
- * @param {{themes:Array, templates:Array, upcoming:Array}} catalog
+ * @param {{themes:Array, templates:Array}} catalog
  * @param {(id:string)=>void} openTemplate
  */
 export function renderGallery(root, catalog, openTemplate) {
-  const { themes, templates, upcoming } = catalog;
-  const tabs = [{ id: "all", name: "전체" }, ...themes];
+  const { themes, templates: cards } = catalog;
+  const tabs = [{ id: "all", name: "전체보기" }, ...themes];
   if (!tabs.some(tab => tab.id === state.theme)) state.theme = "all";
-  const countOf = id => (id === "all" ? templates.length : templates.filter(t => t.themes.includes(id)).length);
+  const countOf = id => (id === "all" ? cards.length : cards.filter(t => t.themes.includes(id)).length);
 
   root.innerHTML = `
     <section class="gallery" aria-labelledby="gallery-title">
       <div class="gallery__head">
-        <h1 id="gallery-title" class="page-title"><span class="highlight">어떤 DM을 보낼까요?</span></h1>
+        <h1 id="gallery-title" class="page-title">고객에게 보내려는 DM을 선택하세요</h1>
       </div>
       <div class="tabs" role="tablist" aria-label="테마">
-        ${tabs.map(tab => `<button type="button" role="tab" class="tab" data-theme="${tab.id}" aria-selected="${state.theme === tab.id}">${escapeHtml(tab.name)} <span>${countOf(tab.id)}</span></button>`).join("")}
+        ${tabs.map(tab => `<button type="button" role="tab" class="tab" data-theme="${tab.id}" aria-selected="${state.theme === tab.id}">${escapeHtml(tab.name)}<span>(${countOf(tab.id)}${tab.id === "all" ? "개" : "장"})</span></button>`).join("")}
       </div>
       <div class="gallery__grid" aria-live="polite"></div>
     </section>`;
@@ -36,10 +36,16 @@ export function renderGallery(root, catalog, openTemplate) {
 
   const paint = () => {
     root.querySelectorAll("[data-theme]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.theme === state.theme)));
-    const list = templates.filter(t => state.theme === "all" || t.themes.includes(state.theme));
+    const selected = root.querySelector('.tab[aria-selected="true"]');
+    if (selected && matchMedia("(max-width: 767px)").matches) {
+      const tabs = selected.parentElement;
+      const offset = selected.offsetLeft - tabs.offsetLeft;
+      if (offset < tabs.scrollLeft || offset + selected.offsetWidth > tabs.scrollLeft + tabs.clientWidth) tabs.scrollLeft = offset;
+    }
+    const list = cards.filter(t => state.theme === "all" || t.themes.includes(state.theme));
     grid.innerHTML = list.length
-      ? list.map(t => cardHtml(t)).join("") + upcoming.map(item => upcomingHtml({ ...item, note: "준비 중이에요" })).join("")
-      : `<div class="empty"><strong>이 테마는 준비 중이에요</strong>
+      ? list.map(t => cardHtml(t)).join("")
+      : `<div class="empty"><strong>등록된 DM이 없습니다.</strong>
           <span><button type="button" class="link" data-reset>전체 DM 보기</button></span></div>`;
   };
 

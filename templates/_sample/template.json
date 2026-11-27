@@ -1,20 +1,75 @@
 {
   "title": "새 DM 제목",
-  "month": "2026-12",
-  "themes": ["season"],
-  "keywords": ["12월", "연말"],
+  "uploadedAt": "2026-12-01",
+  "showNew": true,
+  "themes": [
+    "season"
+  ],
+  "keywords": [
+    "12월",
+    "연말"
+  ],
   "status": "draft",
-  "size": { "width": 800, "height": 1680 },
+  "size": {
+    "width": 800,
+    "height": 1680
+  },
   "thumbnail": "thumb.jpg",
   "fileName": "12월DM",
   "backgrounds": [
-    { "id": "basic", "label": "기본", "file": "bg.jpg", "ppt": "dm.pptx" }
+    {
+      "id": "basic",
+      "label": "기본",
+      "file": "bg.jpg",
+      "ppt": "dm.pptx"
+    }
   ],
-  "fields": ["customerName", "agentName", "agentPhone"],
+  "fields": [
+    "customerName",
+    "agentName",
+    "agentPhone"
+  ],
   "texts": [
-    { "text": "{customerName} 고객님께", "x": 400, "y": 285, "maxWidth": 740, "font": "buri", "size": 51, "color": "#111b5e", "align": "center" },
-    { "text": "{agentName}", "x": 725, "y": 1366, "maxWidth": 400, "font": "buri", "size": 58, "color": "#111b5e", "align": "right" },
-    { "text": "{agentPhone}", "x": 722, "y": 1476, "maxWidth": 400, "font": "dotum", "size": 33, "weight": 700, "color": "#111b5e", "align": "right" }
+    {
+      "text": "{customerName} 고객님께",
+      "x": 400,
+      "y": 285,
+      "maxWidth": 740,
+      "font": "buri",
+      "size": 51,
+      "color": "#111b5e",
+      "align": "center"
+    },
+    {
+      "text": "{agentName}",
+      "x": 725,
+      "y": 1366,
+      "maxWidth": 400,
+      "font": "buri",
+      "size": 58,
+      "color": "#111b5e",
+      "align": "right"
+    },
+    {
+      "text": "{agentPhone}",
+      "x": 722,
+      "y": 1476,
+      "maxWidth": 400,
+      "font": "dotum",
+      "size": 33,
+      "weight": 700,
+      "color": "#111b5e",
+      "align": "right"
+    }
   ],
-  "logo": { "x": 362, "y": 1510, "w": 370, "h": 90, "color": "blue-solid", "kosdaq": true, "align": "right", "valign": "bottom" }
+  "logo": {
+    "x": 362,
+    "y": 1510,
+    "w": 370,
+    "h": 90,
+    "color": "blue-solid",
+    "kosdaq": true,
+    "align": "right",
+    "valign": "bottom"
+  }
 }

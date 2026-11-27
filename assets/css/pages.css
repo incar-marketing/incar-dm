@@ -27,8 +27,9 @@ body.is-editor .site-main { padding-top: var(--space-3); padding-bottom: var(--s
 .back:hover { text-decoration: underline; }
 
 .sender { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text-muted); font-size: var(--text-sm); }
-.sender span { flex: 1; min-width: 0; }
-.sender b { color: var(--color-primary); }
+.sender__info { flex: 1; min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; }
+.sender__label { font-size: 13px; font-weight: 700; }
+.sender__identity { color: var(--color-primary); font-weight: 700; }
 
 .customers { display: flex; flex-direction: column; gap: var(--space-2); flex: 1; min-height: 0; }
 .customers__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--space-2); }
@@ -38,7 +39,7 @@ body.is-editor .site-main { padding-top: var(--space-3); padding-bottom: var(--s
 .customer { display: flex; align-items: center; gap: var(--space-2); }
 .customer__no { width: 24px; flex: none; color: var(--color-text-muted); font-size: 14px; font-weight: 700; text-align: right; }
 .customer__input { height: var(--control-md); font-size: 17px; }
-.customer.is-selected .customer__input { border-color: var(--color-primary); background: var(--color-surface); }
+.customer.is-selected .customer__input { border-color: #aabddd; background: #fff; }
 .customers__actions { display: flex; gap: var(--space-2); padding-left: 32px; }
 .customers__actions .btn--dashed { flex: 1; }
 
@@ -48,11 +49,15 @@ body.is-editor .site-main { padding-top: var(--space-3); padding-bottom: var(--s
 .save__sub { color: var(--color-text-muted); font-size: 14px; }
 .save__buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
 .btn--save { height: 72px; flex-direction: column; gap: 2px; border-width: 2px; background: var(--color-surface); }
-.btn--save strong { font-size: var(--text-lg); font-weight: 800; }
+.btn--save strong { font-size: 22px; font-weight: 700; }
 .btn--save > span { color: var(--color-text-muted); font-size: var(--text-xs); font-weight: 500; }
 .btn--save:hover > span { color: #cfd8f2; }
 
-.reco { display: flex; flex-direction: column; gap: var(--space-2); }
+.reco { display: flex; flex-direction: column; gap: var(--space-2); background: var(--color-white); border: 1px solid #d5dff0; border-bottom: 0; padding: 24px 24px 12px; }
+.notice--done .link { color: var(--dm-blue); text-decoration: none; white-space: nowrap; transition: color .25s ease; }
+.notice--done .link:hover { color: var(--color-primary); }
+.customer .icon-btn { border: 0; background: transparent; color: var(--color-primary); }
+.customer .icon-btn:hover { background: transparent; color: var(--dm-blue); }
 .reco__title { font-size: var(--text-lg); }
 .reco__sub { color: var(--color-text-muted); font-size: 14px; }
 .reco__sub b { color: var(--color-primary); }
@@ -88,7 +93,7 @@ body.is-editor .site-main { padding-top: var(--space-3); padding-bottom: var(--s
   .save__head { justify-content: center; }
   .save__head strong { color: var(--color-text-muted); font-size: 14px; }
   .btn--save { height: 64px; }
-  .btn--save strong { font-size: 17px; }
+  .btn--save strong { font-size: 18px; }
 }
 
 /* 시안 문구가 PC·폰에서 다른 곳 */

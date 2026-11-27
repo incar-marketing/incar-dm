@@ -1,8 +1,8 @@
 /**
  * ui.js — 여러 화면이 함께 쓰는 부품: 글자 이스케이프, 알림, 창(모달), DM 카드, 버튼 '만드는 중' 상태
  */
-import { assetUrl, isNew, monthLabel, formatPhone } from "./templates.js?v=20261123d";
-import { store } from "./store.js?v=20261123d";
+import { assetUrl, isNew, monthLabel, formatPhone } from "./templates.js?v=20261125a";
+import { store } from "./store.js?v=20261125a";
 
 export const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, c =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -80,13 +80,13 @@ export function cardHtml(template, { compact = false } = {}) {
     return `<article class="dm-row">
       <span class="dm-row__thumb">${thumb}</span>
       <div class="dm-row__meta"><small>${monthLabel(template)} ${badgeHtml(template)}</small><strong>${title}</strong></div>
-      <button type="button" class="btn btn--primary btn--sm" data-open="${template.id}">DM 만들기</button>
+      <button type="button" class="btn btn--text btn--sm" data-open="${template.id}">+ DM 만들기</button>
     </article>`;
   }
   return `<article class="dm-card">
     <button type="button" class="dm-card__thumb" data-open="${template.id}" aria-label="${title} 고르기">${thumb}</button>
-    <div class="dm-card__meta"><small>${monthLabel(template)} ${badgeHtml(template)}</small><strong>${title}</strong></div>
-    <button type="button" class="btn btn--primary dm-card__go" data-open="${template.id}" tabindex="-1" aria-hidden="true">고르기</button>
+    <div class="dm-card__meta"><strong>${title}</strong><small>${badgeHtml(template) || escapeHtml(template.uploadedAt?.replaceAll("-", ".") || monthLabel(template))}</small></div>
+    <button type="button" class="btn btn--select dm-card__go" data-open="${template.id}">고르기</button>
   </article>`;
 }
 
@@ -115,8 +115,7 @@ export function openProfileModal({ first, onSaved }) {
     dismissible: !first,
     html: `
       <form class="profile" novalidate>
-        ${first ? "" : `<div class="modal__top"><span></span><button type="button" class="icon-btn" data-close aria-label="닫기">✕</button></div>`}
-        <div><h2 id="profile-title" class="modal__title">${first ? "정보를 입력해주세요!" : "내 정보 고치기"}</h2>
+        <div><div class="modal__top"><h2 id="profile-title" class="modal__title">${first ? "정보를 입력해주세요!" : "내 정보 수정"}</h2>${first ? "" : `<button type="button" class="icon-btn" data-close aria-label="닫기">✕</button>`}</div>
           <p class="modal__sub">DM에 일괄 적용돼요.</p></div>
         <div class="form-grid">
           <div class="field">

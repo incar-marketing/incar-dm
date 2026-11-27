@@ -1,11 +1,11 @@
 /**
  * pages/editor.js — 고객 이름 넣기 · 미리보기 · 저장 · 저장 후 추천
  */
-import { store } from "../store.js?v=20261123d";
-import { FIELDS } from "../templates.js?v=20261123d";
-import { renderDM } from "../renderer.js?v=20261123d";
-import { createAndSave } from "../download.js?v=20261123d";
-import { escapeHtml, toast, openProfileModal, cardHtml, upcomingHtml, setBusy, track } from "../ui.js?v=20261123d";
+import { store } from "../store.js?v=20261125a";
+import { FIELDS } from "../templates.js?v=20261125a";
+import { renderDM } from "../renderer.js?v=20261125a";
+import { createAndSave } from "../download.js?v=20261125a";
+import { escapeHtml, toast, openProfileModal, cardHtml, setBusy, track } from "../ui.js?v=20261125a";
 
 const PLACEHOLDERS = Object.fromEntries(Object.entries(FIELDS).map(([key, field]) => [key, field.placeholder]));
 const cleanName = value => value.replace(/\s*고객님?\s*$/, "").trim();
@@ -27,24 +27,24 @@ export function renderEditor(root, template, catalog, nav) {
 
   root.innerHTML = `
     <div class="editor">
+        <div class="panel__top">
+          <button type="button" class="back" data-action="home">‹ 다른 DM 보기</button>
+          <h1 class="panel__title"><span class="highlight">${escapeHtml(template.title)}</span></h1>
+        </div>
+
       <section class="preview" aria-label="미리보기">
         <div class="preview__nav" aria-live="polite"></div>
         <div class="preview__frame"><canvas class="preview__canvas" role="img" aria-label="DM 미리보기"></canvas></div>
       </section>
       <section class="panel">
-        <div class="panel__top">
-          <button type="button" class="back" data-action="home">← 다른 DM</button>
-          <h1 class="panel__title">${escapeHtml(template.title)}</h1>
-        </div>
         <div class="panel__body"></div>
         <div class="save">
-          <div class="save__head"><strong class="save__title">저장하기</strong><span class="save__sub pc-only"></span></div>
           ${isDraft
             ? `<p class="notice notice--draft">아직 <b>시안</b>이라 저장은 막아 두었어요.</p>`
             : `<div class="save__buttons">
-                <button type="button" class="btn btn--save" data-save="jpg"><strong><span class="pc-only">사진으로 저장</span><span class="m-only">사진</span></strong><span><span class="pc-only">카톡·문자용</span><span class="m-only"><i class="save__n"></i>카톡·문자</span></span></button>
-                <button type="button" class="btn btn--save" data-save="pptx"><strong><span class="pc-only">PPT로 저장</span><span class="m-only">PPT</span></strong><span><span class="pc-only">문구 직접 수정</span><span class="m-only"><i class="save__n"></i>문구 수정</span></span></button>
+                <button type="button" class="btn btn--save" data-save="jpg"><strong>DM 이미지 다운로드</strong><svg class="download-icon" viewBox="0 0 40 28" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 4v12m-6-6 6 6 6-6M4 19v5h32v-5"/></svg></button>
               </div>`}
+          <p class="save__note">* 입력한 고객별 DM 이미지가 생성됩니다.</p>
         </div>
       </section>
     </div>`;
@@ -53,8 +53,6 @@ export function renderEditor(root, template, catalog, nav) {
   const body = root.querySelector(".panel__body");
   const canvas = root.querySelector(".preview__canvas");
   const navBox = root.querySelector(".preview__nav");
-  const saveSub = root.querySelector(".save__sub");
-  const saveTitle = root.querySelector(".save__title");
 
   /* ----- 미리보기: 마지막 요청만 그립니다 ----- */
   let drawTicket = 0;
@@ -69,7 +67,6 @@ export function renderEditor(root, template, catalog, nav) {
          <span><b>${escapeHtml(current)}</b> 고객님 <em>${index + 1}/${names.length}</em></span>
          <button type="button" class="icon-btn" data-step="1" aria-label="다음 고객">›</button>`
       : `<span>${current ? `<b>${escapeHtml(current)}</b> 고객님` : ""}</span>`;
-    paintSaveHead();
     const width = canvas.parentElement.clientWidth || 320;
     const scale = Math.min(2, (width * (window.devicePixelRatio || 1)) / template.size.width);
     const offscreen = document.createElement("canvas");
@@ -86,23 +83,12 @@ export function renderEditor(root, template, catalog, nav) {
     markSelectedRow();
   }
 
-  /* ----- 저장 영역 문구 (시안 그대로) ----- */
-  function paintSaveHead() {
-    const n = store.customerNames.length;
-    const many = !done && n > 1;
-    saveTitle.innerHTML = many
-      ? `<span class="pc-only">${n}명 모두 저장하기</span><span class="m-only">${n}명 모두 저장</span>`
-      : "저장하기";
-    saveSub.textContent = done ? "" : "카톡·문자로 보낼 땐 사진, 문구를 고칠 땐 PPT";
-    root.querySelectorAll(".save__n").forEach(el => { el.textContent = many ? `${n}장 · ` : ""; });
-  }
-
   /* ----- 고객 이름 칸 ----- */
   function customersHtml() {
     const profile = store.profile || {};
     return `
-      <div class="sender"><span>보내는 사람 <b>${escapeHtml(profile.agentName || "")}<span class="pc-only"> 설계사</span></b> · ${escapeHtml(profile.agentPhone || "")}</span>
-        <button type="button" class="btn btn--outline btn--sm" data-action="profile"><span class="pc-only">내 정보 고치기</span><span class="m-only">고치기</span></button></div>
+      <div class="sender"><div class="sender__info"><span class="sender__label">보내는 사람</span><b class="sender__identity">${escapeHtml(profile.agentName || "")}<span class="pc-only"> FA</span> · ${escapeHtml(profile.agentPhone || "")}</b></div>
+        <button type="button" class="btn btn--text btn--sm" data-action="profile">+ 정보수정</button></div>
       ${usesCustomer ? `
       <div class="customers">
         <div class="customers__head"><strong id="customers-title">받는 고객</strong><b class="count" hidden></b></div>
@@ -122,7 +108,7 @@ export function renderEditor(root, template, catalog, nav) {
       <li class="customer">
         <span class="customer__no" aria-hidden="true">${i + 1}</span>
         <input class="input customer__input" data-index="${i}" value="${escapeHtml(name)}" maxlength="${FIELDS.customerName.maxLength}"
-          placeholder="고객 이름" aria-label="고객 ${i + 1} 이름" autocomplete="off" enterkeyhint="next">
+          placeholder="고객 이름을 입력하세요" aria-label="고객 ${i + 1} 이름" autocomplete="off" enterkeyhint="next">
         <button type="button" class="icon-btn" data-remove="${i}" aria-label="고객 ${i + 1} 빼기" ${rows.length === 1 && !name ? "hidden" : ""}>✕</button>
       </li>`).join("");
     updateCount();
@@ -138,8 +124,7 @@ export function renderEditor(root, template, catalog, nav) {
     if (!count) return;
     const n = store.customerNames.length;
     count.hidden = !n;
-    count.textContent = `${n}명`;
-    paintSaveHead();
+    count.textContent = `(${n}명)`;
   }
 
   function markSelectedRow() {
@@ -164,18 +149,14 @@ export function renderEditor(root, template, catalog, nav) {
 
   /* ----- 저장 후 ----- */
   function doneHtml() {
-    const others = catalog.templates.filter(t => t.id !== template.id && t.status === "published").slice(0, 2);
+    const others = catalog.templates.filter(t => t.id !== template.id && t.status === "published").sort((a,b) => b.uploadedAt.localeCompare(a.uploadedAt)).slice(0, 2);
     const what = done.kind === "jpg" ? `사진 저장 완료 (${done.count}장)` : `PPT 저장 완료 (${done.count}개)`;
     return `
-      <div class="notice notice--done" role="status"><span>✓ ${what}</span>
-        <button type="button" class="btn btn--outline btn--sm" data-action="again">다시 만들기</button></div>
+      <div class="notice notice--done" role="status"><span>✓ ${what}</span></div>
       <div class="reco">
-        <h2 class="reco__title">이런 DM은 어떠세요?</h2>
-        <div class="reco__list">
-          ${others.map(t => cardHtml(t, { compact: true })).join("")}
-          ${catalog.upcoming.slice(0, 1).map(item => upcomingHtml(item, "dm-row dm-row--soon")).join("")}
-          <button type="button" class="btn btn--outline btn--block" data-action="home">전체 DM 보기 →</button>
-        </div>
+        ${others.length ? `<h2 class="reco__title">이런 DM은 어떠세요?</h2>
+        <div class="reco__list">${others.map(t => cardHtml(t, { compact: true })).join("")}</div>` : ""}
+        <button type="button" class="btn btn--home btn--block" data-action="all">전체 DM 보기 <span aria-hidden="true">→</span></button>
       </div>`;
   }
 
@@ -183,7 +164,6 @@ export function renderEditor(root, template, catalog, nav) {
     editor.classList.toggle("is-done", !!done);
     body.innerHTML = done ? doneHtml() : customersHtml();
     if (!done) drawRows();
-    paintSaveHead();
   }
 
   /* ----- 저장 ----- */
@@ -209,10 +189,6 @@ export function renderEditor(root, template, catalog, nav) {
       track("dm_download", { template: template.id, format: kind, count: result.count, background: choice.background, logo: choice.logo });
       done = { kind, count: result.count, first: names[0], shared: result.status === "shared" };
       paintBody();
-      if (result.status === "saved") {
-        toast(result.zipped ? `${result.count}명 파일을 압축 파일(zip) 하나로 저장했어요`
-          : kind === "jpg" ? "사진을 저장했어요 (사진첩·다운로드 폴더)" : "PPT 파일을 저장했어요");
-      }
       if (kind === "pptx" && !result.filled) toast("이 기기에서는 이름을 넣지 못해 원본 PPT로 저장했어요");
     } catch (error) {
       console.error(error);
@@ -229,8 +205,8 @@ export function renderEditor(root, template, catalog, nav) {
     if (!target) return;
     const { action, step, remove, save: kind, open } = target.dataset;
     if (action === "home") return nav.goHome();
+    if (action === "all") return nav.goHome(true);
     if (action === "profile") return openProfileModal({ first: false, onSaved: () => { paintBody(); drawPreview(); } });
-    if (action === "again") { done = null; store.setCustomers([""]); store.setPreviewIndex(0); paintBody(); drawPreview(); return body.querySelector(".customer__input")?.focus(); }
     if (action === "add") {
       const empty = store.customers.findIndex(n => !n.trim());
       if (empty < 0) store.setCustomers([...store.customers, ""]);

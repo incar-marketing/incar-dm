@@ -4,7 +4,7 @@
  *
  * 그리는 순서: 배경 이미지(고정 문구 포함) → 바뀌는 글자(texts) → 회사 로고
  */
-import { assetUrl } from "./templates.js?v=20261123d";
+import { assetUrl } from "./templates.js?v=20261125a";
 
 /** DM 안에 들어가는 회사 로고 모양. car = 로고 그림 안 'CAR' 글자의 위·아래 위치(px) */
 export const LOGO_SHAPES = [
@@ -127,7 +127,8 @@ async function drawLogo(ctx, logo, shapeId) {
  */
 export async function renderDM(canvas, template, values, options) {
   const background = template.backgrounds.find(bg => bg.id === options.background) || template.backgrounds[0];
-  const [bgImage] = await Promise.all([loadImage(assetUrl(template, background.file)), fontsReady(template)]);
+  // background.src: 관리자 페이지에서 아직 저장 전인 그림을 미리 볼 때만 씁니다 (template.json 에는 저장되지 않음)
+  const [bgImage] = await Promise.all([loadImage(background.src || assetUrl(template, background.file)), fontsReady(template)]);
   const { width, height } = template.size;
   const scale = options.scale || bgImage.naturalWidth / width;
   canvas.width = Math.round(width * scale);

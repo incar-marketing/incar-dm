@@ -3,16 +3,16 @@
  *   #/            DM 고르기
  *   #/dm/<폴더>    DM 만들기
  */
-import { loadCatalog } from "./templates.js?v=20261123d";
-import { store } from "./store.js?v=20261123d";
-import { openProfileModal, toast } from "./ui.js?v=20261123d";
-import { renderGallery, resetGallery } from "./pages/gallery.js?v=20261123d";
-import { renderEditor } from "./pages/editor.js?v=20261123d";
+import { loadCatalog } from "./templates.js?v=20261125a";
+import { store } from "./store.js?v=20261125a";
+import { openProfileModal, toast } from "./ui.js?v=20261125a";
+import { renderGallery, resetGallery } from "./pages/gallery.js?v=20261125a";
+import { renderEditor } from "./pages/editor.js?v=20261125a";
 
 const app = document.getElementById("app");
 let catalog = null;
 
-const goHome = () => { location.hash = "#/"; };
+const goHome = (all = false) => { if (all) resetGallery(); location.hash = "#/"; };
 const openTemplate = id => { location.hash = `#/dm/${encodeURIComponent(id)}`; };
 
 function route() {
@@ -28,11 +28,12 @@ function route() {
 
 async function start() {
   // 로고(고객 DM)를 누르면 어느 화면에서든 처음 화면으로
-  document.getElementById("home-button").addEventListener("click", () => {
+  const onHomeClick = () => {
     resetGallery();
     if (location.hash === "#/" || location.hash === "") route();
     else goHome();
-  });
+  };
+  for (const id of ["home-button", "home-title"]) document.getElementById(id).addEventListener("click", onHomeClick);
   try {
     catalog = await loadCatalog();
   } catch (error) {
