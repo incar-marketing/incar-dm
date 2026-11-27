@@ -8,8 +8,8 @@
  */
 
 export const IMAGE_RULES = {
-  maxBytes: 10 * 1024 * 1024,   // 올릴 수 있는 원본 크기
-  minWidth: 800,                // DM 기준 폭(800)보다 작으면 흐려 보임
+  maxBytes: 50 * 1024 * 1024,   // 올릴 수 있는 원본 크기 (올린 뒤 가로 1200px 이하 JPG로 줄여 저장)
+  sharpWidth: 800,              // 이보다 작으면 저장되는 DM이 흐려 보일 수 있어 안내만 함 (막지 않음)
   backgroundWidth: 1200,        // 저장할 배경 폭 (DM 기준 폭의 1.5배)
   thumbnailWidth: 360,          // 목록 카드용
   quality: 0.85
@@ -39,7 +39,7 @@ function toJpeg(source, width) {
 
 /** 배경 그림: 검사 후 { blob, url(미리보기용), width, height } */
 export async function prepareBackground(file) {
-  if (file.size > IMAGE_RULES.maxBytes) throw new Error("그림 파일은 10MB 이하로 올려 주세요");
+  if (file.size > IMAGE_RULES.maxBytes) throw new Error("그림 파일은 50MB 이하로 올려 주세요");
   if (!(await looksLikeImage(file))) throw new Error("JPG · PNG · WEBP 그림만 올릴 수 있어요");
   let bitmap;
   try {
@@ -47,7 +47,6 @@ export async function prepareBackground(file) {
   } catch {
     throw new Error("그림을 열 수 없어요. 다른 파일로 올려 주세요");
   }
-  if (bitmap.width < IMAGE_RULES.minWidth) throw new Error(`가로 ${IMAGE_RULES.minWidth}px 이상인 그림을 올려 주세요`);
   const result = await toJpeg(bitmap, Math.min(bitmap.width, IMAGE_RULES.backgroundWidth));
   bitmap.close();
   return { ...result, url: URL.createObjectURL(result.blob) };

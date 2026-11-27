@@ -6,13 +6,13 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127e";
-import { renderDM } from "../../assets/js/renderer.js?v=20261127e";
-import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127e";
-import { saveChanges, jsonFile } from "./api.js?v=20261127e";
-import { confirmDialog } from "./dialog.js?v=20261127e";
-import { readPptLayout } from "./pptx.js?v=20261127e";
-import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127e";
+import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127f";
+import { renderDM } from "../../assets/js/renderer.js?v=20261127f";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127f";
+import { saveChanges, jsonFile } from "./api.js?v=20261127f";
+import { confirmDialog } from "./dialog.js?v=20261127f";
+import { readPptLayout } from "./pptx.js?v=20261127f";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127f";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };
@@ -298,7 +298,8 @@ export async function renderForm(root, { manifest, templates, template, onDone }
       draft.size = { width: DM_WIDTH, height: Math.round(DM_WIDTH * prepared.height / prepared.width) };
       dirty = true;
       await refreshBackground();
-      warnIfRatioDiffers();
+      if (prepared.width < IMAGE_RULES.sharpWidth) toast(`그림이 작아서(가로 ${prepared.width}px) 저장되는 DM이 조금 흐려 보일 수 있어요. 그대로 써도 돼요`);
+      else warnIfRatioDiffers();
     } catch (error) {
       event.target.value = "";
       showErrors([error.message]);
