@@ -1,0 +1,67 @@
+{
+  "title": "동지",
+  "uploadedAt": "2026-11-27",
+  "themes": [
+    "season"
+  ],
+  "keywords": [],
+  "status": "published",
+  "size": {
+    "width": 800,
+    "height": 1679
+  },
+  "thumbnail": "thumb.jpg",
+  "fileName": "12월DM",
+  "backgrounds": [
+    {
+      "id": "basic",
+      "label": "기본",
+      "file": "bg.jpg",
+      "ppt": "dm.pptx"
+    }
+  ],
+  "fields": [
+    "customerName",
+    "agentName",
+    "agentPhone"
+  ],
+  "texts": [
+    {
+      "text": "{customerName} 고객님께",
+      "x": 399.9,
+      "y": 265.7,
+      "maxWidth": 692,
+      "font": "buri",
+      "size": 47.6,
+      "weight": 700,
+      "color": "#111b5e",
+      "align": "center"
+    },
+    {
+      "text": "{agentName}",
+      "x": 735.8,
+      "y": 1367.2,
+      "maxWidth": 269,
+      "font": "suit",
+      "size": 56,
+      "weight": 400,
+      "color": "#000000",
+      "align": "right"
+    },
+    {
+      "text": "{agentPhone}",
+      "x": 735.8,
+      "y": 1486.6,
+      "maxWidth": 299,
+      "font": "dotum",
+      "size": 42,
+      "weight": 400,
+      "color": "#111b5e",
+      "align": "right"
+    }
+  ],
+  "pptText": {
+    "{설계사}": "{agentName}",
+    "010.0000.0000": "{agentPhone}"
+  }
+}
