@@ -1,20 +1,20 @@
 {
   "themes": [
     {
-      "id": "health",
-      "name": "건강"
-    },
-    {
-      "id": "finance",
-      "name": "금융"
-    },
-    {
       "id": "season",
       "name": "계절"
     },
     {
       "id": "insurance",
       "name": "보험"
+    },
+    {
+      "id": "finance",
+      "name": "금융"
+    },
+    {
+      "id": "health",
+      "name": "건강"
     }
   ],
   "templates": [
