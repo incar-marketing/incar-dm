@@ -6,17 +6,18 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127g";
-import { renderDM } from "../../assets/js/renderer.js?v=20261127g";
-import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127g";
-import { saveChanges, jsonFile } from "./api.js?v=20261127g";
-import { confirmDialog } from "./dialog.js?v=20261127g";
-import { readPptLayout } from "./pptx.js?v=20261127g";
-import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127g";
+import { FIELDS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127h";
+import { renderDM } from "../../assets/js/renderer.js?v=20261127h";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127h";
+import { saveChanges, jsonFile } from "./api.js?v=20261127h";
+import { confirmDialog } from "./dialog.js?v=20261127h";
+import { readPptLayout } from "./pptx.js?v=20261127h";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127h";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };
-const FONT_LABEL = { suit: "SUIT (고딕)", buri: "아리따 부리", dotum: "아리따 돋움", script: "필기체" };
+/** 이름 자리에 쓰는 글꼴은 이 3개로 고정 (마케팅부 결정, 2026-11-27) — 사이트에 들어 있는 글꼴과 같아야 합니다 */
+const FONT_LABEL = { suit: "SUIT (고딕)", buri: "아리따 부리", dotum: "아리따 돋움" };
 const ALIGN_LABEL = { left: "왼쪽 기준", center: "가운데 기준", right: "오른쪽 기준" };
 const WEIGHTS = [400, 700, 800];
 /** 미리보기·썸네일에 넣는 예시 값 (실제 개인정보를 쓰지 않습니다) */
@@ -158,7 +159,7 @@ export async function renderForm(root, { manifest, templates, template, onDone }
           ${numberField("x", "x", item)}${numberField("y", "y", item)}${numberField("크기", "size", item, 0.5)}
           ${numberField("최대 폭", "maxWidth", item)}${numberField("자간", "letterSpacing", item, 0.1)}
           <label class="mini-field">정렬<select class="input input--sm" data-key="align">${options(Object.keys(ALIGN_LABEL), ALIGN_LABEL, item.align || "left")}</select></label>
-          <label class="mini-field">글꼴<select class="input input--sm" data-key="font">${options(FONTS, FONT_LABEL, item.font)}</select></label>
+          <label class="mini-field">글꼴<select class="input input--sm" data-key="font">${options(Object.keys(FONT_LABEL), FONT_LABEL, item.font)}</select></label>
           <label class="mini-field">굵기<select class="input input--sm" data-key="weight">${options(WEIGHTS, null, item.weight || 400)}</select></label>
           <label class="mini-field">색<input class="input input--sm input--color" type="color" data-key="color" value="${escapeHtml(item.color || "#000000")}"></label>
         </div>

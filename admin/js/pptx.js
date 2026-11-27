@@ -5,8 +5,8 @@
  * 표시는 사용자 화면의 PPT 저장(download.js)과 같은 PPT_TOKENS 를 씁니다 → 같은 PPT로 PPT 저장도 그대로 됩니다.
  * PPT 를 그림으로 바꾸는 일은 하지 않습니다(배경 그림은 따로 올림). 읽은 값은 관리자가 미리보기로 확인·조정합니다.
  */
-import { PPT_TOKENS } from "../../assets/js/templates.js?v=20261127g";
-import { readZip } from "../../assets/js/download.js?v=20261127g";
+import { PPT_TOKENS } from "../../assets/js/templates.js?v=20261127h";
+import { readZip } from "../../assets/js/download.js?v=20261127h";
 
 export const PPT_RULES = { maxBytes: 15 * 1024 * 1024 };
 const EMU_PER_PT = 12700;
@@ -22,11 +22,10 @@ const PPT_ALIASES = {
 const attr = (xml, name) => xml?.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1];
 const unescapeXml = text => text.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
 
-/** PPT 글꼴 이름 → DM 글꼴 (사이트에 있는 글꼴 중 가장 가까운 것) */
+/** PPT 글꼴 이름 → DM 글꼴 (SUIT·아리따 부리·아리따 돋움 중 가장 가까운 것, 모르면 SUIT) */
 function fontFor(typeface = "") {
   if (/buri|부리|myeongjo|명조|batang|바탕|serif/i.test(typeface)) return "buri";
   if (/dotum|돋움/i.test(typeface)) return "dotum";
-  if (/script|pinyon/i.test(typeface)) return "script";
   return "suit";
 }
 

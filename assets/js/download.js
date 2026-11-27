@@ -5,8 +5,8 @@
  *  - 여러 명: 휴대폰은 공유창, PC는 zip 파일 하나로
  * 외부 라이브러리 없이 브라우저 기본 기능만 씁니다.
  */
-import { assetUrl, PPT_TOKENS } from "./templates.js?v=20261127g";
-import { renderToBlob } from "./renderer.js?v=20261127g";
+import { assetUrl, PPT_TOKENS } from "./templates.js?v=20261127h";
+import { renderToBlob } from "./renderer.js?v=20261127h";
 
 /* ---------- zip 읽기·쓰기 (PPT 파일도 zip 구조입니다) ---------- */
 const CRC_TABLE = (() => {
