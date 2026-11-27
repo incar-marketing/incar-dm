@@ -1,7 +1,7 @@
 /**
  * admin/js/dialog.js — 되돌리기 어려운 작업 전에 한 번 더 묻는 창 (사용자 화면의 openModal 재사용)
  */
-import { openModal, escapeHtml } from "../../assets/js/ui.js?v=20261127f";
+import { openModal, escapeHtml } from "../../assets/js/ui.js?v=20261127g";
 
 /**
  * @param {object} options

@@ -6,13 +6,13 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127f";
-import { renderDM } from "../../assets/js/renderer.js?v=20261127f";
-import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127f";
-import { saveChanges, jsonFile } from "./api.js?v=20261127f";
-import { confirmDialog } from "./dialog.js?v=20261127f";
-import { readPptLayout } from "./pptx.js?v=20261127f";
-import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127f";
+import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127g";
+import { renderDM } from "../../assets/js/renderer.js?v=20261127g";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127g";
+import { saveChanges, jsonFile } from "./api.js?v=20261127g";
+import { confirmDialog } from "./dialog.js?v=20261127g";
+import { readPptLayout } from "./pptx.js?v=20261127g";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127g";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };
@@ -105,13 +105,10 @@ export async function renderForm(root, { manifest, templates, template, onDone }
           <section class="form-card">
             <h2 class="form-card__title">배경 그림</h2>
             <div class="field"><label for="f-bg">${isNew ? "배경 그림 올리기" : "배경 그림 바꾸기"}</label>
-              <input class="input input--file" id="f-bg" type="file" accept="image/jpeg,image/png,image/webp">
-              <span class="field__hint">PPT를 PNG·JPG로 내보낸 그림을 올려 주세요. 이름 자리에 표시가 찍혀 있어도 PPT를 함께 올리면 자동으로 지워요. 가로 ${IMAGE_RULES.backgroundWidth}px을 권장하고, 더 크면 자동으로 줄여요. 목록용 작은 그림(썸네일)은 저장할 때 자동으로 만들어져요.</span></div>
+              <input class="input input--file" id="f-bg" type="file" accept="image/jpeg,image/png,image/webp"></div>
             <div class="field"><label for="f-ppt">PPT 파일 (선택)</label>
               <input class="input input--file" id="f-ppt" type="file" accept=".pptx">
-              <span class="field__hint">PPT의 이름 자리에 <b>{고객명} {설계사}(또는 {설계사명}) 010.0000.0000(또는 {연락처})</b>를 적어 두면, 그 위치·크기·색을 읽어 아래 글자 자리를 자동으로 채워요. 같은 PPT로 설계사의 PPT 저장도 돼요.${draft.backgrounds[0].ppt ? ` (지금 파일: ${escapeHtml(draft.backgrounds[0].ppt)})` : ""}</span>
-              <label class="check"><input type="checkbox" name="eraseMarkers" checked> 배경 그림에 찍힌 표시 글자는 자동으로 지우기</label>
-              <span class="field__hint">PPT를 그대로 내보낸 그림을 올려도 돼요. 표시 양옆 색으로 채워서 단색·그라데이션 배경에서는 깔끔해요. 사진·무늬 위라 티가 나면 끄고, 표시를 지운 그림을 올려 주세요.</span></div>
+              <label class="check"><input type="checkbox" name="eraseMarkers" checked> 배경 그림에 찍힌 표시 글자는 자동으로 지우기</label></div>
           </section>
 
           <section class="form-card">
