@@ -6,13 +6,13 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127i";
-import { renderDM, FONT_WEIGHTS, nearestWeight } from "../../assets/js/renderer.js?v=20261127i";
-import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127i";
-import { saveChanges, jsonFile } from "./api.js?v=20261127i";
-import { confirmDialog } from "./dialog.js?v=20261127i";
-import { readPptLayout } from "./pptx.js?v=20261127i";
-import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127i";
+import { FIELDS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127j";
+import { renderDM, FONT_WEIGHTS, nearestWeight } from "../../assets/js/renderer.js?v=20261127j";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127j";
+import { saveChanges, jsonFile } from "./api.js?v=20261127j";
+import { confirmDialog } from "./dialog.js?v=20261127j";
+import { readPptLayout } from "./pptx.js?v=20261127j";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127j";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };
@@ -157,7 +157,7 @@ export async function renderForm(root, { manifest, templates, template, onDone }
         <div class="token-row">${Object.entries(FIELDS).map(([key, field]) => `<button type="button" class="btn btn--sm" data-token="${key}">+ ${field.label}</button>`).join("")}</div>
         <div class="text-line__grid">
           ${numberField("x", "x", item)}${numberField("y", "y", item)}${numberField("크기", "size", item, 0.5)}
-          ${numberField("최대 폭", "maxWidth", item)}${numberField("자간", "letterSpacing", item, 0.1)}
+          ${numberField("자간", "letterSpacing", item, 0.1)}
           <label class="mini-field">정렬<select class="input input--sm" data-key="align">${options(Object.keys(ALIGN_LABEL), ALIGN_LABEL, item.align || "left")}</select></label>
           <label class="mini-field">글꼴<select class="input input--sm" data-key="font">${options(Object.keys(FONT_LABEL), FONT_LABEL, item.font)}</select></label>
           <label class="mini-field">굵기<select class="input input--sm" data-key="weight">${(FONT_WEIGHTS[item.font] || FONT_WEIGHTS.suit).weights.map(w =>
@@ -285,7 +285,7 @@ export async function renderForm(root, { manifest, templates, template, onDone }
     drawLines();
     await refreshBackground();
     // {설계사}·010.0000.0000 처럼 다른 글자로 표시한 자리는 '없는 표시'에서 뺍니다
-    const aliasFor = { "{설계사명}": "{agentName}", "{연락처}": "{agentPhone}" };
+    const aliasFor = { "{고객명}": "{customerName}", "{설계사명}": "{agentName}", "{연락처}": "{agentPhone}" };
     const missing = layout.missing.filter(token => !Object.values(layout.pptText).includes(aliasFor[token]));
     toast(`PPT에서 글자 자리 ${layout.texts.length}개를 읽었어요. 미리보기로 확인해 주세요${missing.length ? ` (없는 표시: ${missing.join(" ")})` : ""}`);
     if (!isNew || newBackground) warnIfRatioDiffers();
@@ -334,7 +334,8 @@ export async function renderForm(root, { manifest, templates, template, onDone }
       return;
     }
     if (target.closest("[data-add-line]")) {
-      draft.texts.push({ text: "{customerName}", x: DM_WIDTH / 2, y: 100, font: "suit", size: 32, weight: 700, color: "#000000", align: "center" });
+      // maxWidth: 이름이 길면 이 폭에 맞춰 글자가 작아짐 (화면에는 안 보이고, PPT를 올리면 글상자 폭으로 바뀜)
+      draft.texts.push({ text: "{customerName}", x: DM_WIDTH / 2, y: 100, maxWidth: DM_WIDTH - 100, font: "suit", size: 32, weight: 700, color: "#000000", align: "center" });
       selected = draft.texts.length - 1;
       dirty = true;
       drawLines();

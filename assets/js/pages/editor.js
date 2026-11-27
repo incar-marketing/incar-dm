@@ -1,11 +1,11 @@
 /**
  * pages/editor.js — 고객 이름 넣기 · 미리보기 · 저장 · 저장 후 추천
  */
-import { store } from "../store.js?v=20261127i";
-import { FIELDS } from "../templates.js?v=20261127i";
-import { renderDM } from "../renderer.js?v=20261127i";
-import { createAndSave } from "../download.js?v=20261127i";
-import { escapeHtml, toast, openProfileModal, cardHtml, setBusy, track } from "../ui.js?v=20261127i";
+import { store } from "../store.js?v=20261127j";
+import { FIELDS } from "../templates.js?v=20261127j";
+import { renderDM } from "../renderer.js?v=20261127j";
+import { createAndSave } from "../download.js?v=20261127j";
+import { escapeHtml, toast, openProfileModal, cardHtml, setBusy, track } from "../ui.js?v=20261127j";
 
 const PLACEHOLDERS = Object.fromEntries(Object.entries(FIELDS).map(([key, field]) => [key, field.placeholder]));
 const cleanName = value => value.replace(/\s*고객님?\s*$/, "").trim();

@@ -1,13 +1,13 @@
 /**
- * admin/js/pptx.js — PPT 안의 {고객명}·{설계사명}(또는 {설계사})·{연락처}(또는 010.0000.0000) 표시를 찾아 글자 자리(texts)로 바꿉니다.
+ * admin/js/pptx.js — PPT 안의 {고객명}(또는 OOO)·{설계사명}(또는 {설계사})·{연락처}(또는 010.0000.0000) 표시를 찾아 글자 자리(texts)로 바꿉니다.
  *
  * PPT 에서 표시가 든 글상자의 위치·크기·정렬·글자 크기·색·자간을 읽어 DM 가로 800 기준 값으로 옮깁니다.
  * 표시는 사용자 화면의 PPT 저장(download.js)과 같은 PPT_TOKENS 를 씁니다 → 같은 PPT로 PPT 저장도 그대로 됩니다.
  * PPT 를 그림으로 바꾸는 일은 하지 않습니다(배경 그림은 따로 올림). 읽은 값은 관리자가 미리보기로 확인·조정합니다.
  */
-import { PPT_TOKENS } from "../../assets/js/templates.js?v=20261127i";
-import { readZip } from "../../assets/js/download.js?v=20261127i";
-import { nearestWeight } from "../../assets/js/renderer.js?v=20261127i";
+import { PPT_TOKENS } from "../../assets/js/templates.js?v=20261127j";
+import { readZip } from "../../assets/js/download.js?v=20261127j";
+import { nearestWeight } from "../../assets/js/renderer.js?v=20261127j";
 
 export const PPT_RULES = { maxBytes: 15 * 1024 * 1024 };
 const EMU_PER_PT = 12700;
@@ -15,6 +15,7 @@ const LINE_HALF = 0.75;   // 글자 크기 대비 한 줄 높이의 절반 (기�
 const ALIGN = { l: "left", ctr: "center", r: "right", just: "left" };
 /** 기본 표시({고객명} 등) 말고도 알아보는 글자. 찾으면 template.json 의 pptText 로 저장해 PPT 저장 때도 바뀝니다 */
 const PPT_ALIASES = {
+  "OOO": "customerName", "○○○": "customerName",
   "{설계사}": "agentName",
   "010.0000.0000": "agentPhone", "010-0000-0000": "agentPhone",
   "010.000.0000": "agentPhone", "010-000-0000": "agentPhone"
