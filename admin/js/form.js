@@ -6,13 +6,13 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127c";
-import { renderDM } from "../../assets/js/renderer.js?v=20261127c";
-import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127c";
-import { saveChanges, jsonFile } from "./api.js?v=20261127c";
-import { confirmDialog } from "./dialog.js?v=20261127c";
-import { readPptLayout } from "./pptx.js?v=20261127c";
-import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127c";
+import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127d";
+import { renderDM } from "../../assets/js/renderer.js?v=20261127d";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127d";
+import { saveChanges, jsonFile } from "./api.js?v=20261127d";
+import { confirmDialog } from "./dialog.js?v=20261127d";
+import { readPptLayout } from "./pptx.js?v=20261127d";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127d";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };
@@ -158,7 +158,7 @@ export async function renderForm(root, { manifest, templates, template, onDone }
         </div>
         <div class="token-row">${Object.entries(FIELDS).map(([key, field]) => `<button type="button" class="btn btn--sm" data-token="${key}">+ ${field.label}</button>`).join("")}</div>
         <div class="text-line__grid">
-          ${numberField("x", "x", item, 0.1)}${numberField("y", "y", item, 0.1)}${numberField("크기", "size", item, 0.1)}
+          ${numberField("x", "x", item)}${numberField("y", "y", item)}${numberField("크기", "size", item, 0.5)}
           ${numberField("최대 폭", "maxWidth", item)}${numberField("자간", "letterSpacing", item, 0.1)}
           <label class="mini-field">정렬<select class="input input--sm" data-key="align">${options(Object.keys(ALIGN_LABEL), ALIGN_LABEL, item.align || "left")}</select></label>
           <label class="mini-field">글꼴<select class="input input--sm" data-key="font">${options(FONTS, FONT_LABEL, item.font)}</select></label>
@@ -300,6 +300,17 @@ export async function renderForm(root, { manifest, templates, template, onDone }
       event.target.value = "";
       showErrors([error.message]);
     }
+  });
+
+  /* 숫자 칸: 키보드 ↑↓는 step 만큼, Shift+↑↓는 10배 (x·y는 1 / 10, 크기는 0.5 / 5) */
+  form.addEventListener("keydown", event => {
+    const input = event.target;
+    if (!event.shiftKey || input.type !== "number" || !["ArrowUp", "ArrowDown"].includes(event.key)) return;
+    event.preventDefault();
+    const step = Number(input.step) || 1;
+    const value = (parseFloat(input.value) || 0) + (event.key === "ArrowUp" ? 10 : -10) * step;
+    input.value = Math.round(value * 10) / 10;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
   });
 
   form.addEventListener("focusin", event => {
