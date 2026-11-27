@@ -6,13 +6,13 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127d";
-import { renderDM } from "../../assets/js/renderer.js?v=20261127d";
-import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127d";
-import { saveChanges, jsonFile } from "./api.js?v=20261127d";
-import { confirmDialog } from "./dialog.js?v=20261127d";
-import { readPptLayout } from "./pptx.js?v=20261127d";
-import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127d";
+import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127e";
+import { renderDM } from "../../assets/js/renderer.js?v=20261127e";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127e";
+import { saveChanges, jsonFile } from "./api.js?v=20261127e";
+import { confirmDialog } from "./dialog.js?v=20261127e";
+import { readPptLayout } from "./pptx.js?v=20261127e";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127e";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };
@@ -106,7 +106,7 @@ export async function renderForm(root, { manifest, templates, template, onDone }
             <h2 class="form-card__title">배경 그림</h2>
             <div class="field"><label for="f-bg">${isNew ? "배경 그림 올리기" : "배경 그림 바꾸기"}</label>
               <input class="input input--file" id="f-bg" type="file" accept="image/jpeg,image/png,image/webp">
-              <span class="field__hint">이름·연락처 자리를 비워 둔 그림을 올려 주세요. 가로 ${IMAGE_RULES.backgroundWidth}px을 권장하고, 더 크면 자동으로 줄여요. 목록용 작은 그림(썸네일)은 저장할 때 미리보기로 자동으로 만들어져요.</span></div>
+              <span class="field__hint">PPT를 PNG·JPG로 내보낸 그림을 올려 주세요. 이름 자리에 표시가 찍혀 있어도 PPT를 함께 올리면 자동으로 지워요. 가로 ${IMAGE_RULES.backgroundWidth}px을 권장하고, 더 크면 자동으로 줄여요. 목록용 작은 그림(썸네일)은 저장할 때 자동으로 만들어져요.</span></div>
             <div class="field"><label for="f-ppt">PPT 파일 (선택)</label>
               <input class="input input--file" id="f-ppt" type="file" accept=".pptx">
               <span class="field__hint">PPT의 이름 자리에 <b>{고객명} {설계사}(또는 {설계사명}) 010.0000.0000(또는 {연락처})</b>를 적어 두면, 그 위치·크기·색을 읽어 아래 글자 자리를 자동으로 채워요. 같은 PPT로 설계사의 PPT 저장도 돼요.${draft.backgrounds[0].ppt ? ` (지금 파일: ${escapeHtml(draft.backgrounds[0].ppt)})` : ""}</span>
@@ -182,7 +182,10 @@ export async function renderForm(root, { manifest, templates, template, onDone }
   async function drawPreview() {
     const mine = ++ticket;
     const hasBackground = !isNew || newBackground;
-    form.querySelector(".preview-box__empty").hidden = !!hasBackground;
+    const empty = form.querySelector(".preview-box__empty");
+    empty.hidden = !!hasBackground;
+    // PPT만 올렸다면 무엇을 더 올려야 하는지 알려 줍니다 (PPT는 그림으로 바꾸지 않음)
+    empty.textContent = newPpt ? "PPT는 읽었어요. 이제 이 PPT를 PNG로 내보내 '배경 그림' 칸에 올리면 미리보기가 보여요." : "배경 그림을 올리면 미리보기가 보여요.";
     canvas.hidden = !hasBackground;
     if (!hasBackground) return;
     const shown = document.createElement("canvas");

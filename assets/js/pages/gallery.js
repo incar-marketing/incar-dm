@@ -1,7 +1,7 @@
 /**
  * pages/gallery.js — DM 고르기: 테마 탭 · DM 카드
  */
-import { cardHtml, escapeHtml } from "../ui.js?v=20261127d";
+import { cardHtml, escapeHtml } from "../ui.js?v=20261127e";
 
 const state = { theme: "all" };
 
