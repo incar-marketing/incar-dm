@@ -31,7 +31,7 @@
       "x": 399.9,
       "y": 265.7,
       "maxWidth": 692,
-      "font": "dotum",
+      "font": "suit",
       "size": 47.6,
       "weight": 700,
       "color": "#111b5e",
@@ -40,12 +40,12 @@
     {
       "text": "{agentName}",
       "x": 735.8,
-      "y": 1367.2,
+      "y": 1358.2,
       "maxWidth": 269,
       "font": "suit",
       "size": 56,
       "weight": 400,
-      "color": "#111b5e",
+      "color": "#000000",
       "align": "right"
     },
     {
