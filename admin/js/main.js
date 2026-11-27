@@ -8,11 +8,11 @@
  * 데이터는 사용자 화면과 같은 파일(templates/manifest.json, 각 template.json)을 그대로 읽고 씁니다.
  * 저장은 api.js → 관리자 서버(worker/) → GitHub 커밋. 저장에 성공하면 새로 불러와 최신 상태를 보여 줍니다.
  */
-import { loadCatalog, fetchJSON, assetUrl, isNew } from "../../assets/js/templates.js?v=20261127h";
-import { escapeHtml, toast, setBusy } from "../../assets/js/ui.js?v=20261127h";
-import { saveChanges, jsonFile } from "./api.js?v=20261127h";
-import { renderForm, STATUS_LABEL } from "./form.js?v=20261127h";
-import { confirmDialog } from "./dialog.js?v=20261127h";
+import { loadCatalog, fetchJSON, assetUrl, isNew } from "../../assets/js/templates.js?v=20261127i";
+import { escapeHtml, toast, setBusy } from "../../assets/js/ui.js?v=20261127i";
+import { saveChanges, jsonFile } from "./api.js?v=20261127i";
+import { renderForm, STATUS_LABEL } from "./form.js?v=20261127i";
+import { confirmDialog } from "./dialog.js?v=20261127i";
 
 const app = document.getElementById("admin");
 const NOTICE_KEY = "dmstudio.admin.notice";

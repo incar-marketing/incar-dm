@@ -5,8 +5,9 @@
  * 표시는 사용자 화면의 PPT 저장(download.js)과 같은 PPT_TOKENS 를 씁니다 → 같은 PPT로 PPT 저장도 그대로 됩니다.
  * PPT 를 그림으로 바꾸는 일은 하지 않습니다(배경 그림은 따로 올림). 읽은 값은 관리자가 미리보기로 확인·조정합니다.
  */
-import { PPT_TOKENS } from "../../assets/js/templates.js?v=20261127h";
-import { readZip } from "../../assets/js/download.js?v=20261127h";
+import { PPT_TOKENS } from "../../assets/js/templates.js?v=20261127i";
+import { readZip } from "../../assets/js/download.js?v=20261127i";
+import { nearestWeight } from "../../assets/js/renderer.js?v=20261127i";
 
 export const PPT_RULES = { maxBytes: 15 * 1024 * 1024 };
 const EMU_PER_PT = 12700;
@@ -29,11 +30,13 @@ function fontFor(typeface = "") {
   return "suit";
 }
 
-/** 굵기: 굵게 버튼(b="1") 또는 글꼴 이름의 Bold·Heavy 등 */
-function weightFor(run) {
+/** 굵기: 글꼴 이름(Thin·Light·Medium·SemiBold·Bold·Heavy…) 또는 굵게 버튼(b="1") → 그 글꼴에 있는 가장 가까운 굵기 */
+const WEIGHT_NAMES = [[/hair ?line|thin/i, 100], [/extra ?light|ultra ?light/i, 200], [/light/i, 300], [/medium/i, 500],
+  [/semi ?bold|demi ?bold/i, 600], [/extra ?bold|ultra ?bold/i, 800], [/heavy|black/i, 900], [/bold|\sB$/i, 700]];
+function weightFor(run, font) {
   const typeface = run.match(/<a:(?:ea|latin) typeface="([^"]*)"/)?.[1] || "";
-  if (/extra ?bold|heavy|black/i.test(typeface)) return 800;
-  return attr(run, "b") === "1" || /bold|\sB$/i.test(typeface) ? 700 : 400;
+  const named = WEIGHT_NAMES.find(([pattern]) => pattern.test(typeface))?.[1];
+  return nearestWeight(font, named || (attr(run, "b") === "1" ? 700 : 400));
 }
 
 /**
@@ -93,7 +96,7 @@ export async function readPptLayout(file, dmWidth) {
         maxWidth: Math.round(right - left),
         font: fontFor(run.match(/<a:(?:ea|latin) typeface="([^"]*)"/)?.[1]),
         size: round(size),
-        weight: weightFor(run),
+        weight: weightFor(run, fontFor(run.match(/<a:(?:ea|latin) typeface="([^"]*)"/)?.[1])),
         color: `#${(run.match(/<a:srgbClr val="([0-9A-Fa-f]{6})"/)?.[1] || "000000").toLowerCase()}`,
         align
       };

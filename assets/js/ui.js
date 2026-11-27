@@ -1,8 +1,8 @@
 /**
  * ui.js — 여러 화면이 함께 쓰는 부품: 글자 이스케이프, 알림, 창(모달), DM 카드, 버튼 '만드는 중' 상태
  */
-import { assetUrl, isNew, monthLabel, formatPhone } from "./templates.js?v=20261127h";
-import { store } from "./store.js?v=20261127h";
+import { assetUrl, isNew, monthLabel, formatPhone } from "./templates.js?v=20261127i";
+import { store } from "./store.js?v=20261127i";
 
 export const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, c =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

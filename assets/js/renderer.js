@@ -4,7 +4,7 @@
  *
  * 그리는 순서: 배경 이미지(고정 문구 포함) → 바뀌는 글자(texts) → 회사 로고
  */
-import { assetUrl } from "./templates.js?v=20261127h";
+import { assetUrl } from "./templates.js?v=20261127i";
 
 /** DM 안에 들어가는 회사 로고 모양. car = 로고 그림 안 'CAR' 글자의 위·아래 위치(px) */
 export const LOGO_SHAPES = [
@@ -19,8 +19,28 @@ const FONT_FAMILY = {
   buri: '"buri", "Noto Serif KR", serif',
   dotum: '"dotum", "Malgun Gothic", sans-serif',
   script: '"Pinyon Script", "Times New Roman", serif',
-  suit: '"SUIT", sans-serif'   // 고딕 (굵기 400/700/800)
+  suit: '"dm-suit", "SUIT", sans-serif'
 };
+
+/** 글꼴마다 실제 파일이 있는 굵기 (tokens.css 의 @font-face 와 같게). 첫 값 = 굵기를 안 적었을 때 쓰는 굵기 */
+export const FONT_WEIGHTS = {
+  suit: { default: 400, weights: [100, 200, 300, 400, 500, 600, 700, 800, 900] },
+  buri: { default: 700, weights: [250, 300, 500, 600, 700] },    // 예전엔 Bold 하나뿐이라 굵기 없는 줄은 Bold 로 그림
+  dotum: { default: 500, weights: [250, 300, 500, 600, 700] }    // 예전엔 Medium 하나뿐
+};
+
+/** 원하는 굵기와 가장 가까운, 실제로 있는 굵기 */
+export function nearestWeight(font, weight) {
+  const info = FONT_WEIGHTS[font];
+  if (!info) return weight || 400;
+  if (!weight) return info.default;
+  // 같은 거리면 400 이상은 더 굵은 쪽, 400 미만은 더 가는 쪽 (브라우저 글꼴 고르는 규칙과 같음: 400 → 500)
+  const better = (w, best) => {
+    const dw = Math.abs(w - weight), db = Math.abs(best - weight);
+    return dw < db || (dw === db && (weight >= 400 ? w > best : w < best));
+  };
+  return info.weights.reduce((best, w) => (better(w, best) ? w : best));
+}
 const PLACEHOLDER = "rgba(255, 214, 0, 0.65)";
 const TOKEN = /\{(\w+)\}/g;
 
@@ -39,7 +59,7 @@ export function loadImage(src) {
   return imageCache.get(src);
 }
 
-const fontSpec = (item, size) => `${item.weight || 400} ${size}px ${FONT_FAMILY[item.font]}`;
+const fontSpec = (item, size) => `${nearestWeight(item.font, item.weight)} ${size}px ${FONT_FAMILY[item.font]}`;
 
 async function fontsReady(template) {
   const specs = new Set(template.texts.map(item => fontSpec(item, item.size)));
