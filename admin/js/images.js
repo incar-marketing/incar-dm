@@ -3,14 +3,14 @@
  *
  * 1) 확장자가 아니라 파일 앞부분(시그니처)으로 JPG·PNG·WEBP인지 확인
  * 2) 브라우저로 실제로 열어 그림이 맞는지 확인
- * 3) 가로 1200px 이하 JPG로 다시 저장 → 용량을 줄이고 그림 안에 숨은 다른 내용을 없앰
+ * 3) 가로 1000px 이하 JPG로 다시 저장 → 용량을 줄이고 그림 안에 숨은 다른 내용을 없앰
  * 서버(worker)도 저장 전에 같은 시그니처·용량 검사를 한 번 더 합니다.
  */
 
 export const IMAGE_RULES = {
-  maxBytes: 50 * 1024 * 1024,   // 올릴 수 있는 원본 크기 (올린 뒤 가로 1200px 이하 JPG로 줄여 저장)
+  maxBytes: 50 * 1024 * 1024,   // 올릴 수 있는 원본 크기 (올린 뒤 가로 1000px 이하 JPG로 줄여 저장)
   sharpWidth: 800,              // 이보다 작으면 저장되는 DM이 흐려 보일 수 있어 안내만 함 (막지 않음)
-  backgroundWidth: 1200,        // 저장할 배경 폭 (DM 기준 폭의 1.5배)
+  backgroundWidth: 1000,        // 저장할 배경 폭 (DM 기준 폭의 1.25배, 2026-11-27 과장님 요청으로 1200→1000)
   thumbnailWidth: 360,          // 목록 카드용
   quality: 0.85
 };
@@ -37,7 +37,7 @@ function toJpeg(source, width) {
   "image/jpeg", IMAGE_RULES.quality));
 }
 
-/** 배경 그림: 검사 후 { blob, url(미리보기용), width, height } */
+/** 배경 그림: 검사 후 { blob, url(미리보기용), width, height, ratio(원본 세로/가로) } */
 export async function prepareBackground(file) {
   if (file.size > IMAGE_RULES.maxBytes) throw new Error("그림 파일은 50MB 이하로 올려 주세요");
   if (!(await looksLikeImage(file))) throw new Error("JPG · PNG · WEBP 그림만 올릴 수 있어요");
@@ -47,9 +47,10 @@ export async function prepareBackground(file) {
   } catch {
     throw new Error("그림을 열 수 없어요. 다른 파일로 올려 주세요");
   }
+  const ratio = bitmap.height / bitmap.width;   // 줄이기 전 원본 비율 (줄인 크기는 반올림돼 1px 어긋날 수 있음)
   const result = await toJpeg(bitmap, Math.min(bitmap.width, IMAGE_RULES.backgroundWidth));
   bitmap.close();
-  return { ...result, url: URL.createObjectURL(result.blob) };
+  return { ...result, ratio, url: URL.createObjectURL(result.blob) };
 }
 
 /**

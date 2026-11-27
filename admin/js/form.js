@@ -6,13 +6,13 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127j";
-import { renderDM, FONT_WEIGHTS, nearestWeight } from "../../assets/js/renderer.js?v=20261127j";
-import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127j";
-import { saveChanges, jsonFile } from "./api.js?v=20261127j";
-import { confirmDialog } from "./dialog.js?v=20261127j";
-import { readPptLayout } from "./pptx.js?v=20261127j";
-import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127j";
+import { FIELDS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127k";
+import { renderDM, FONT_WEIGHTS, nearestWeight } from "../../assets/js/renderer.js?v=20261127k";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127k";
+import { saveChanges, jsonFile } from "./api.js?v=20261127k";
+import { confirmDialog } from "./dialog.js?v=20261127k";
+import { readPptLayout } from "./pptx.js?v=20261127k";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127k";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };
@@ -299,7 +299,7 @@ export async function renderForm(root, { manifest, templates, template, onDone }
       if (newBackground) URL.revokeObjectURL(newBackground.url);
       newBackground = prepared;
       // 글자 위치는 가로 800 기준이라, 세로는 그림 비율에 맞춥니다
-      draft.size = { width: DM_WIDTH, height: Math.round(DM_WIDTH * prepared.height / prepared.width) };
+      draft.size = { width: DM_WIDTH, height: Math.round(DM_WIDTH * prepared.ratio) };
       dirty = true;
       await refreshBackground();
       if (prepared.width < IMAGE_RULES.sharpWidth) toast(`그림이 작아서(가로 ${prepared.width}px) 저장되는 DM이 조금 흐려 보일 수 있어요. 그대로 써도 돼요`);
