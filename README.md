@@ -68,7 +68,7 @@ dm-studio/
    - **썸네일** `thumb.jpg`: 완성된 DM 모양(예시 이름이 들어간)을 가로 360px 정도로.
    - **PPT** (`dm.pptx`): 디자이너가 준 파일을 그대로 넣어도 됩니다. 이름 자리의 글자(예: `OOO`)는 `template.json`의 `pptText`에 적어 줍니다. (4장 참고)
 3. `template.json`을 고칩니다.
-   - `title` 제목, `uploadedAt` 업로드 날짜 `"2026-12-01"` 형식, `showNew` NEW 표시(`true`/`false`, 없으면 이번 달 DM만 NEW), `themes` 카테고리 id, `keywords` 검색어(지금 화면에는 검색이 없어 쓰이지 않음)
+   - `title` 제목, `uploadedAt` 업로드 날짜 `"2026-12-01"` 형식, `showNew` NEW 표시(`true` 항상 · `false` 안 함 · 없으면 자동: 업로드 날짜부터 14일, 기간은 `templates.js`의 `NEW_DAYS`), `themes` 카테고리 id, `keywords` 검색어(지금 화면에는 검색이 없어 쓰이지 않음)
    - `backgrounds`: 배경 하나당 `{ "id", "label", "file", "ppt" }`. 지금 화면에는 배경 고르기가 없어서(시안에서 뺌) 첫 번째 배경이 쓰입니다.
    - `texts`: 바뀌는 글자 한 줄당 하나. `{customerName}`·`{agentName}`·`{agentPhone}`이 그 자리에 들어갑니다.
      - `x`, `y`: 글자 줄의 **가운데 높이**와 기준점(px, 800×1680 기준). `align`이 `right`면 x가 오른쪽 끝, `center`면 가운데.
@@ -131,7 +131,7 @@ dm-studio/
 
 ## 코드를 고친 뒤 꼭 할 일 (새 버전 바로 보이게)
 
-브라우저는 사이트 파일을 최대 10분 동안 저장해 두고 다시 씁니다. `assets/`·`admin/` 안의 JS·CSS를 고쳤다면 **`index.html`, `assets/js/`, `admin/` 안의 `?v=20261127a` 같은 표시를 전부 새 값(예: 오늘 날짜)으로 바꿔** 주세요. 편집기의 '모두 바꾸기'로 한 번에 바꾸면 됩니다. 템플릿(JSON·이미지·PPT)만 바꿀 때는 필요 없습니다.
+브라우저는 사이트 파일을 최대 10분 동안 저장해 두고 다시 씁니다. `assets/`·`admin/` 안의 JS·CSS를 고쳤다면 **`index.html`, `assets/js/`, `admin/` 안의 `?v=20261127b` 같은 표시를 전부 새 값(예: 오늘 날짜)으로 바꿔** 주세요. 편집기의 '모두 바꾸기'로 한 번에 바꾸면 됩니다. 템플릿(JSON·이미지·PPT)만 바꿀 때는 필요 없습니다.
 
 ## 6. 관리자 페이지
 

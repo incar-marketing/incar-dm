@@ -96,11 +96,16 @@ export async function loadCatalog({ includeHidden = false } = {}) {
   return { themes, templates: results.filter(Boolean) };
 }
 
-/** NEW 표시: showNew 값을 따르고, 값이 없으면 이번 달에 올린 DM만 NEW */
+/** NEW 를 자동으로 붙이는 기간(업로드 날짜부터 며칠) — 바꾸려면 이 숫자만 고치세요 */
+export const NEW_DAYS = 14;
+
+/** NEW 표시: showNew 가 true/false 면 그대로, 값이 없으면(자동) 업로드 날짜부터 NEW_DAYS 일 동안만 NEW */
 export function isNew(template) {
-  const now = new Date();
-  const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  return template.showNew ?? template.uploadedAt.startsWith(thisMonth);
+  if (typeof template.showNew === "boolean") return template.showNew;
+  const [year, month, day] = template.uploadedAt.split("-").map(Number);
+  const uploaded = new Date(year, month - 1, day);          // 이 기기 시간 기준 그날 0시
+  const days = (Date.now() - uploaded.getTime()) / 86400000;
+  return days >= 0 && days < NEW_DAYS;
 }
 
 export function monthLabel(template) {

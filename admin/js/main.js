@@ -8,11 +8,11 @@
  * 데이터는 사용자 화면과 같은 파일(templates/manifest.json, 각 template.json)을 그대로 읽고 씁니다.
  * 저장은 api.js → 관리자 서버(worker/) → GitHub 커밋. 저장에 성공하면 새로 불러와 최신 상태를 보여 줍니다.
  */
-import { loadCatalog, fetchJSON, assetUrl } from "../../assets/js/templates.js?v=20261127a";
-import { escapeHtml, toast, setBusy } from "../../assets/js/ui.js?v=20261127a";
-import { saveChanges, jsonFile } from "./api.js?v=20261127a";
-import { renderForm, STATUS_LABEL } from "./form.js?v=20261127a";
-import { confirmDialog } from "./dialog.js?v=20261127a";
+import { loadCatalog, fetchJSON, assetUrl, isNew } from "../../assets/js/templates.js?v=20261127b";
+import { escapeHtml, toast, setBusy } from "../../assets/js/ui.js?v=20261127b";
+import { saveChanges, jsonFile } from "./api.js?v=20261127b";
+import { renderForm, STATUS_LABEL } from "./form.js?v=20261127b";
+import { confirmDialog } from "./dialog.js?v=20261127b";
 
 const app = document.getElementById("admin");
 const NOTICE_KEY = "dmstudio.admin.notice";
@@ -88,7 +88,7 @@ function renderList() {
             </div>
             <div class="dm-admin-row__state">
               <span class="state state--${t.status}">${STATUS_LABEL[t.status]}</span>
-              ${t.showNew ? `<span class="state state--new">NEW</span>` : ""}
+              ${isNew(t) ? `<span class="state state--new">NEW${typeof t.showNew === "boolean" ? "" : " (자동)"}</span>` : ""}
             </div>
             <button type="button" class="btn btn--sm" data-go="#/edit/${encodeURIComponent(folder)}">수정</button>` : `
             <div class="dm-admin-row__meta">

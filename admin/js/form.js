@@ -6,13 +6,13 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, FONTS, STATUSES, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127a";
-import { renderDM } from "../../assets/js/renderer.js?v=20261127a";
-import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127a";
-import { saveChanges, jsonFile } from "./api.js?v=20261127a";
-import { confirmDialog } from "./dialog.js?v=20261127a";
-import { readPptLayout } from "./pptx.js?v=20261127a";
-import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127a";
+import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127b";
+import { renderDM } from "../../assets/js/renderer.js?v=20261127b";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127b";
+import { saveChanges, jsonFile } from "./api.js?v=20261127b";
+import { confirmDialog } from "./dialog.js?v=20261127b";
+import { readPptLayout } from "./pptx.js?v=20261127b";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127b";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };
@@ -27,6 +27,7 @@ const NUMBER_KEYS = ["x", "y", "size", "maxWidth", "letterSpacing", "weight"];
 const OPTIONAL_KEYS = ["maxWidth", "letterSpacing"];   // 비우면 설정에서 뺍니다
 
 const today = () => new Date().toLocaleDateString("sv-SE");   // "2026-11-25"
+const newMode = showNew => (showNew === true ? "on" : showNew === false ? "off" : "auto");
 
 /** 화면용으로 붙은 값(id·folder·order)을 빼고 template.json 내용만 남깁니다 */
 function fileData(template) {
@@ -46,7 +47,8 @@ export async function renderForm(root, { manifest, templates, template, onDone }
   const isNew = !template;
   const draft = isNew ? await fetchJSON("templates/_sample/template.json") : fileData(template);
   if (isNew) {
-    Object.assign(draft, { title: "", uploadedAt: today(), status: "draft", themes: [], keywords: [], showNew: true });
+    Object.assign(draft, { title: "", uploadedAt: today(), status: "draft", themes: [], keywords: [] });
+    delete draft.showNew;   // NEW 는 기본 '자동'(업로드 날짜부터 NEW_DAYS 일)
     // 본(_sample)의 로고·PPT 자리는 새 DM에 파일이 없으므로 뺍니다 (로고는 배경 그림에 넣어 두세요)
     delete draft.logo;
     delete draft.pptText;
@@ -94,7 +96,10 @@ export async function renderForm(root, { manifest, templates, template, onDone }
               <div class="check-row">${STATUSES.map(status => `<label class="check"><input type="radio" name="status" value="${status}" ${draft.status === status ? "checked" : ""}> ${STATUS_LABEL[status]}</label>`).join("")}</div>
               <span class="field__hint" data-status-hint>${STATUS_HINT[draft.status]}</span>
             </fieldset>
-            <label class="check"><input type="checkbox" name="showNew" ${draft.showNew ? "checked" : ""}> 목록에 NEW 표시</label>
+            <fieldset class="field"><legend>NEW 표시</legend>
+              <div class="check-row">${[["auto", `자동 (업로드 날짜부터 ${NEW_DAYS}일)`], ["on", "항상 표시"], ["off", "표시 안 함"]].map(([value, label]) =>
+                `<label class="check"><input type="radio" name="showNew" value="${value}" ${value === newMode(draft.showNew) ? "checked" : ""}> ${label}</label>`).join("")}</div>
+            </fieldset>
           </section>
 
           <section class="form-card">
@@ -216,7 +221,10 @@ export async function renderForm(root, { manifest, templates, template, onDone }
 
   function readTopInput(input) {
     if (input.name === "themes") draft.themes = [...form.querySelectorAll('[name="themes"]:checked')].map(box => box.value);
-    else if (input.name === "showNew") draft.showNew = input.checked;
+    else if (input.name === "showNew") {   // 자동이면 showNew 를 빼서 날짜로 정합니다
+      if (input.value === "auto") delete draft.showNew;
+      else draft.showNew = input.value === "on";
+    }
     else if (input.name === "status") {
       draft.status = input.value;
       form.querySelector("[data-status-hint]").textContent = STATUS_HINT[input.value];
