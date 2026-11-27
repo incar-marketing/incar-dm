@@ -9,12 +9,12 @@
       "name": "보험"
     },
     {
-      "id": "finance",
-      "name": "금융"
-    },
-    {
       "id": "health",
       "name": "건강"
+    },
+    {
+      "id": "finance",
+      "name": "금융"
     }
   ],
   "templates": [
