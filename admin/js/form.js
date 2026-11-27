@@ -6,13 +6,13 @@
  * 미리보기는 사용자 화면과 같은 renderDM 으로 그려서, 저장될 DM과 똑같이 보입니다.
  * 새 DM은 templates/_sample/template.json 을 시작 값으로 씁니다.
  */
-import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127b";
-import { renderDM } from "../../assets/js/renderer.js?v=20261127b";
-import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127b";
-import { saveChanges, jsonFile } from "./api.js?v=20261127b";
-import { confirmDialog } from "./dialog.js?v=20261127b";
-import { readPptLayout } from "./pptx.js?v=20261127b";
-import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127b";
+import { FIELDS, FONTS, STATUSES, NEW_DAYS, validate, fetchJSON } from "../../assets/js/templates.js?v=20261127c";
+import { renderDM } from "../../assets/js/renderer.js?v=20261127c";
+import { escapeHtml, setBusy, toast } from "../../assets/js/ui.js?v=20261127c";
+import { saveChanges, jsonFile } from "./api.js?v=20261127c";
+import { confirmDialog } from "./dialog.js?v=20261127c";
+import { readPptLayout } from "./pptx.js?v=20261127c";
+import { prepareBackground, eraseMarks, makeThumbnail, blobToBase64, IMAGE_RULES } from "./images.js?v=20261127c";
 
 export const STATUS_LABEL = { published: "공개", draft: "시안", hidden: "비공개" };
 const STATUS_HINT = { published: "목록에 보이고 저장할 수 있어요", draft: "목록에 '시안'으로 보이고 저장은 막혀요", hidden: "목록에서 빠져요" };

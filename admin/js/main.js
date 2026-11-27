@@ -8,11 +8,11 @@
  * 데이터는 사용자 화면과 같은 파일(templates/manifest.json, 각 template.json)을 그대로 읽고 씁니다.
  * 저장은 api.js → 관리자 서버(worker/) → GitHub 커밋. 저장에 성공하면 새로 불러와 최신 상태를 보여 줍니다.
  */
-import { loadCatalog, fetchJSON, assetUrl, isNew } from "../../assets/js/templates.js?v=20261127b";
-import { escapeHtml, toast, setBusy } from "../../assets/js/ui.js?v=20261127b";
-import { saveChanges, jsonFile } from "./api.js?v=20261127b";
-import { renderForm, STATUS_LABEL } from "./form.js?v=20261127b";
-import { confirmDialog } from "./dialog.js?v=20261127b";
+import { loadCatalog, fetchJSON, assetUrl, isNew } from "../../assets/js/templates.js?v=20261127c";
+import { escapeHtml, toast, setBusy } from "../../assets/js/ui.js?v=20261127c";
+import { saveChanges, jsonFile } from "./api.js?v=20261127c";
+import { renderForm, STATUS_LABEL } from "./form.js?v=20261127c";
+import { confirmDialog } from "./dialog.js?v=20261127c";
 
 const app = document.getElementById("admin");
 const NOTICE_KEY = "dmstudio.admin.notice";
@@ -22,6 +22,7 @@ let manifest = null;      // 저장된 manifest.json
 let templates = [];       // 불러온 DM (비공개 포함)
 let order = null;         // 순서를 바꾸는 중이면 폴더 이름 목록 (저장 전)
 let themes = null;        // 카테고리를 고치는 중이면 그 목록 (저장 전)
+let hasUnsaved = null;    // DM 등록·수정 화면이면 '저장 안 한 내용이 있는지' 알려 주는 함수
 
 const go = hash => { location.hash = hash; };
 
@@ -164,10 +165,12 @@ function route() {
   const edit = hash.match(/^#\/edit\/(.+)$/);
   const onDone = saved => (saved ? afterSave() : go("#/"));
   window.scrollTo(0, 0);
-  if (hash === "#/new") return renderForm(app, { manifest, templates, template: null, onDone });
+  hasUnsaved = null;
+  const openForm = template => renderForm(app, { manifest, templates, template, onDone }).then(check => { hasUnsaved = check; });
+  if (hash === "#/new") return openForm(null);
   if (edit) {
     const template = templates.find(t => t.folder === decodeURIComponent(edit[1]));
-    if (template) return renderForm(app, { manifest, templates, template, onDone });
+    if (template) return openForm(template);
     toast("찾는 DM이 없어요");
   }
   if (hash === "#/categories") return renderCategories();
@@ -196,6 +199,14 @@ app.addEventListener("click", event => {
   if (t.dataset.themeDelete) { themes.splice(Number(t.dataset.themeDelete), 1); return renderCategories(); }
   if ("themeReset" in t.dataset) { themes = null; return renderCategories(); }
   if ("themeSave" in t.dataset) return saveThemes(t);
+});
+
+/* 상단 DM STUDIO 로고 → DM 목록. 저장 안 한 내용이 있으면 먼저 묻습니다 */
+document.querySelector(".admin-header__home").addEventListener("click", event => {
+  event.preventDefault();
+  const leave = () => { order = null; hasUnsaved = null; location.hash === "#/" ? route() : go("#/"); };
+  if (hasUnsaved?.()) confirmDialog({ title: "저장하지 않고 나갈까요?", message: "고친 내용이 사라져요.", ok: "나가기", onOk: leave });
+  else leave();
 });
 
 app.addEventListener("input", event => {
